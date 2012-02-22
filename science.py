@@ -1,9 +1,19 @@
 import sys, os
 import pygame
 from pygame.locals import *
+import maps
+import objects
+# from optpartse import OptionParser
 
 if not pygame.font: print 'Warning, fonts disabled'
 if not pygame.mixer: print 'Warning, sound disabled'
+
+# parser = OptionParser()
+# parser.add_option("-f", "--filename", type="string")
+
+
+assert "--file=" in sys.argv[1], "Call this program as python science.py --filename=<filename>"
+mapname = sys.argv[1][7:]
 
 pygame.init()
 fpsClock = pygame.time.Clock()
@@ -24,11 +34,15 @@ mousex, mousey = 0, 0
 fontObj = pygame.font.Font('freesansbold.ttf', 32)
 msg = 'Hello World! This is out Science! game'
 
+map = maps.Map(filename=mapname)
+
 while True:
     windowSurfaceObj.fill(whiteColor)
 
     pygame.draw.rect(windowSurfaceObj, redColor, (10,10,50,100))
     windowSurfaceObj.blit(drawingSurfaceObj, (0, 0))
+    
+    map.render(windowSurfaceObj)
 
     windowSurfaceObj.blit(characterObj, (mousex, mousey))
 
