@@ -13,7 +13,7 @@ resolution = (640,480)
 windowSurfaceObj = pygame.display.set_mode(resolution)
 pygame.display.set_caption('Out Dump Science Test')
 
-drawingSurfaceObj = pygame.image.load('drawing.png')
+drawingSurfaceObj = pygame.image.load('media/drawing.png')
 redColor = pygame.Color(255,0,0)
 greenColor = pygame.Color(0,255,0)
 blueColor = pygame.Color(0,0,255)
