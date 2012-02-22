@@ -1,1 +1,4 @@
-;; bwahahahaha
+Run this game with 
+python science.py --file=<filename>
+where <filename> is the relative path to the map you want to load. 
+Default maps are available in the maps/ directory.
