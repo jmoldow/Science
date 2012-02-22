@@ -14,6 +14,7 @@ windowSurfaceObj = pygame.display.set_mode(resolution)
 pygame.display.set_caption('Out Dump Science Test')
 
 drawingSurfaceObj = pygame.image.load('media/images/drawing.png')
+characterObj = pygame.image.load('media/images/etymology_man.png')
 redColor = pygame.Color(255,0,0)
 greenColor = pygame.Color(0,255,0)
 blueColor = pygame.Color(0,0,255)
@@ -27,8 +28,9 @@ while True:
     windowSurfaceObj.fill(whiteColor)
 
     pygame.draw.rect(windowSurfaceObj, redColor, (10,10,50,100))
+    windowSurfaceObj.blit(drawingSurfaceObj, (0, 0))
 
-    windowSurfaceObj.blit(drawingSurfaceObj, (mousex, mousey))
+    windowSurfaceObj.blit(characterObj, (mousex, mousey))
 
     msgSurfaceObj = fontObj.render(msg, False, blueColor)
     msgRectangleObj = msgSurfaceObj.get_rect()
@@ -40,6 +42,8 @@ while True:
         if event.type == QUIT:
             pygame.quit()
             sys.exit()
+        if event.type == MOUSEMOTION:
+            mousex, mousey = event.pos
 
     pygame.display.update()
     fpsClock.tick(30)
