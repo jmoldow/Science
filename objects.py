@@ -1,6 +1,6 @@
 import pygame
 
-__all__ = ['GameObject', 'Stalactite', 'Platform', 'Stalagmite']
+__all__ = ['GameObject', 'Stalactite', 'Platform', 'Stalagmite', 'Character']
 
 class GameObject(object):
     
@@ -17,16 +17,28 @@ class GameObject(object):
     @classmethod
     def getMapChar(cls):
         return cls._map_char
-    
+
     def getPosition(self):
         return self._position
+
+    def getGlobalMapPosition(self):
+        return self.getPosition()
+
+    def getRelativeWindowPosition(self, visible_window_tl = [0,0]):
+        return [self._position[i] - visible_window_tl[i] for i in range(2)]
     
+    def setPosition(self, position):
+        self._position = position
+
+    def setRelativeWindowPosition(self, position, visible_window_tl = [0,0]):
+        self.setPosition([position[i] + visible_window_tl[i] for i in range(2)])
+
     def logic(self):
         pass
 
-    def render(self, window):
+    def render(self, window, visible_window_tl):
         if self._imagename:
-            window.blit(pygame.image.load(self.getImageName()), self._position)
+            window.blit(pygame.image.load(self.getImageName()), self.getRelativeWindowPosition(visible_window_tl))
 
 class Stalactite(GameObject):
     _map_char = 'V'
@@ -39,4 +51,7 @@ class Platform(GameObject):
 class Stalagmite(GameObject):
     _map_char = '^'
     _imagename = 'media/images/stalagmite.png'
-    
+
+class Character(GameObject):
+    _map_char = 'C'
+    _imagename = 'media/images/etymology_man.png'

@@ -6,8 +6,8 @@ class Map(object):
     def __init__(self, filename=None):
         f = open(filename, 'r')
         self._data = f.readlines()
-        for line in self._data:
-            line = line[:-1]
+        for i in range(len(self._data)):
+            self._data[i] = self._data[i][:-1]
         self._dimensions = (len(self._data[0]), len(self._data))
         f.close()
 
