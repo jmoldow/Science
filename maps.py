@@ -1,4 +1,5 @@
 import objects
+from collections import defaultdict
 
 class Map(object):
 
@@ -31,11 +32,11 @@ class Map(object):
                 return object_type
         return objects.GameObject
 
-    def render(self, window):
-        window_width, window_height = window.get_size()
-        width_between_objects = window_width / self.getWidth()
-        height_between_objects = window_height / self.getHeight()
+    def load(self, window, tile_size):
+        width, height = tile_size
+        all_objects = defaultdict(list)
         for i in range(self.getWidth()):
             for j in range(self.getHeight()):
-                gameObj = self.get_terrain_type((i,j))()
-                gameObj.render(window, (i*width_between_objects, j*height_between_objects))
+                gameObj = self.get_terrain_type((i,j))((i*width, j*height))
+                all_objects[gameObj.__class__.__name__].append(gameObj)
+        return all_objects

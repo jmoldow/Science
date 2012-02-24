@@ -19,6 +19,7 @@ pygame.init()
 fpsClock = pygame.time.Clock()
 
 resolution = (640,480)
+tile_size = (32, 32)
 
 windowSurfaceObj = pygame.display.set_mode(resolution)
 pygame.display.set_caption('Science!')
@@ -29,12 +30,16 @@ whiteColor = pygame.Color(255,255,255)
 
 
 map = maps.Map(filename=mapname)
+all_objects = map.load(windowSurfaceObj, tile_size)
 
 while True:
     windowSurfaceObj.fill(whiteColor)
-    map.render(windowSurfaceObj)
-
+    
     windowSurfaceObj.blit(characterObj, (mousex, mousey))
+    
+    for object_type in objects.__all__:
+        for gameObj in all_objects[object_type]:
+            gameObj.logic()
 
     for event in pygame.event.get():
         if event.type == QUIT:
@@ -42,6 +47,10 @@ while True:
             sys.exit()
         if event.type == MOUSEMOTION:
             mousex, mousey = event.pos
+
+    for object_type in objects.__all__:
+        for gameObj in all_objects[object_type]:
+            gameObj.render(windowSurfaceObj)
 
     pygame.display.update()
     fpsClock.tick(30)

@@ -6,9 +6,9 @@ class GameObject(object):
     
     _imagename = ''
     _map_char = ''
-
-    def __init__(self,*args,**kwargs):
-        pass
+    
+    def __init__(self,position,*args,**kwargs):
+        self._position = position
     
     @classmethod
     def getImageName(cls):
@@ -18,9 +18,15 @@ class GameObject(object):
     def getMapChar(cls):
         return cls._map_char
     
-    def render(self, window, pos):
+    def getPosition(self):
+        return self._position
+    
+    def logic(self):
+        pass
+
+    def render(self, window):
         if self._imagename:
-            window.blit(pygame.image.load(self.getImageName()), pos)
+            window.blit(pygame.image.load(self.getImageName()), self._position)
 
 class Stalactite(GameObject):
     _map_char = 'V'
