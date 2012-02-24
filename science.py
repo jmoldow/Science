@@ -13,7 +13,7 @@ if not pygame.mixer: print 'Warning, sound disabled'
 
 
 assert "--file=" in sys.argv[1], "Call this program as python science.py --filename=<filename>"
-mapname = sys.argv[1][7:]
+mapname = sys.argv[1].partition("=")[2]
 
 pygame.init()
 fpsClock = pygame.time.Clock()
@@ -24,11 +24,8 @@ windowSurfaceObj = pygame.display.set_mode(resolution)
 pygame.display.set_caption('Science!')
 
 characterObj = pygame.image.load('media/images/etymology_man.png')
-redColor = pygame.Color(255,0,0)
-greenColor = pygame.Color(0,255,0)
-blueColor = pygame.Color(0,0,255)
-whiteColor = pygame.Color(255,255,255)
 mousex, mousey = 0, 0
+whiteColor = pygame.Color(255,255,255)
 
 
 map = maps.Map(filename=mapname)
