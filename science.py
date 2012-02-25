@@ -25,21 +25,30 @@ character_frame_size = (160,160)
 windowSurfaceObj = pygame.display.set_mode(resolution)
 pygame.display.set_caption('Science!')
 
-mousex, mousey = [resolution[i]/2 for i in range(2)]
 whiteColor = pygame.Color(255,255,255)
-
+keypad_to_pixel_dir_map = {K_UP:(1,-1), K_DOWN:(1,1), K_RIGHT:(0,1), K_LEFT:(0,-1)}
+dir_keys = keypad_to_pixel_dir_map.keys()
 
 map = maps.Map(filename=mapname)
 all_objects = map.load(windowSurfaceObj, tile_size)
 mapDimensions = map.getDimensions()
 characterObj = None
 if len(all_objects['Character']) == 1:
-    characterObj = all_objects['Character'].pop()
+    characterObj = all_objects['Character'][0]
     all_objects['GameObject'].append(objects.GameObject(characterObj.getPosition()))
 elif len(all_objects['Character']):
     raise Exception('The map you loaded has more than two character starting positions.')
 else:
     raise Exception('The map you loaded has no character starting position.')
+
+def correctWindowforBoundary(visible_window_tl, resolution, tile_size, mapDimensions):
+    new_visible_window_tl = list(visible_window_tl)
+    for i in range(2):
+        if new_visible_window_tl[i] < 0:
+            new_visible_window_tl[i] = 0
+        elif new_visible_window_tl[i] + resolution[i] > mapDimensions[i]*tile_size[i]:
+            new_visible_window_tl[i] = mapDimensions[i]*tile_size[i] - resolution[i]
+    return new_visible_window_tl
 
 def moveWindow(characterPosition, visible_window_tl, resolution, tile_size, character_frame_size, mapDimensions):
     new_visible_window_tl = list(visible_window_tl)
@@ -48,37 +57,33 @@ def moveWindow(characterPosition, visible_window_tl, resolution, tile_size, char
             new_visible_window_tl[i] = characterPosition[i]+(tile_size[i]/2)-(character_frame_size[i]/2)
         elif (characterPosition[i]+(tile_size[i]/2)+(character_frame_size[i]/2)) > visible_window_tl[i] + resolution[i]:
             new_visible_window_tl[i] = characterPosition[i] + (tile_size[i]/2) + (character_frame_size[i]/2) - resolution[i]
-        if new_visible_window_tl[i] < 0:
-            new_visible_window_tl[i] = 0
-        elif new_visible_window_tl[i] + resolution[i] > mapDimensions[i]*tile_size[i]:
-            new_visible_window_tl[i] = mapDimensions[i]*tile_size[i] - resolution[i]
-    return new_visible_window_tl
+    return correctWindowforBoundary(new_visible_window_tl, resolution, tile_size, mapDimensions)
 
-visible_window_tl = moveWindow(characterObj.getPosition(), [0,0], resolution, tile_size, character_frame_size, mapDimensions) 
+def centerWindow(characterPosition, resolution, tile_size, mapDimensions):
+    new_visible_window_tl = [characterPosition[i]+(tile_size[i]/2)-(resolution[i]/2) for i in range(2)]
+    return correctWindowforBoundary(new_visible_window_tl, resolution, tile_size, mapDimensions)
+
+visible_window_tl = centerWindow(characterObj.getPosition(), resolution, tile_size, mapDimensions) 
 
 while True:
     windowSurfaceObj.fill(whiteColor)
-    characterObj.setRelativeWindowPosition((mousex,mousey), visible_window_tl)
     visible_window_tl = moveWindow(characterObj.getPosition(), visible_window_tl, resolution, tile_size, character_frame_size, mapDimensions)
 
     for object_type in objects.__all__:
         for gameObj in all_objects[object_type]:
             gameObj.logic()
-
+            gameObj.return_to_map(mapDimensions, tile_size)
+    
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
             sys.exit()
-        if event.type == MOUSEMOTION:
-            mousex, mousey = event.pos
-
+    
     for object_type in objects.__all__:
         for gameObj in all_objects[object_type]:
             gameObj.render(windowSurfaceObj, visible_window_tl)
     
-    characterObj.render(windowSurfaceObj, visible_window_tl)
-
     pygame.display.update()
-    fpsClock.tick(30)
+    fpsClock.tick(100)
 
 
