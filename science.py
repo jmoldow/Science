@@ -26,6 +26,7 @@ windowSurfaceObj = pygame.display.set_mode(resolution)
 pygame.display.set_caption('Science!')
 
 whiteColor = pygame.Color(255,255,255)
+menuImg = pygame.image.load('media/images/menu.png')
 keypad_to_pixel_dir_map = {K_UP:(1,-1), K_DOWN:(1,1), K_RIGHT:(0,1), K_LEFT:(0,-1)}
 dir_keys = keypad_to_pixel_dir_map.keys()
 
@@ -65,7 +66,24 @@ def centerWindow(characterPosition, resolution, tile_size, mapDimensions):
 
 visible_window_tl = centerWindow(characterObj.getPosition(), resolution, tile_size, mapDimensions) 
 
+menu = True
 while True:
+    if menu:
+        windowSurfaceObj.fill(whiteColor)
+        windowSurfaceObj.blit(menuImg, (0,0))
+        while menu:
+            for event in pygame.event.get():
+                if event.type == MOUSEBUTTONDOWN:
+                    x, y = event.pos
+                    if 200 < y and y < 282:
+                        menu = False
+                    if 355 < y and y < 459:
+                        menu = False
+                        pygame.quit()
+                        sys.exit()
+            pygame.display.update()
+            fpsClock.tick(100)
+            
     windowSurfaceObj.fill(whiteColor)
     visible_window_tl = moveWindow(characterObj.getPosition(), visible_window_tl, resolution, tile_size, character_frame_size, mapDimensions)
 
