@@ -1,16 +1,8 @@
-import math
-
-class Obj:
-    pos = [0,0]
-    vel = [0,0]
-    def __init__(self, pos, vel):
-        self.pos = pos
-        self.vel = vel
-
-def applyForce(obj, forceVector, dt):
-    # obj has  .pos, .vel fields
-        # force vector is a tuple
-    # mutate fields and return obj
+def applyConstantForce(obj, forceVector, dt):
+    # This is the one to use!
+    # Obj is any object with two properties: .pos is a 2-tuple of position values, and .vel is a 2-tuple of velocity values.
+    # Force vector is a 2-tuple.
+    # We don't use the advanced force-function capability yet, we just pass a constant force.
     objInitialState = State(obj.pos, obj.vel)
     objFinalState = integrate(objInitialState, 0.0, dt, (lambda s, t: forceVector))
     obj.pos = objFinalState.pos
@@ -32,8 +24,9 @@ class Derivative(object):
         self.dVel = dVel
         
 def evaluate(initial, t, dt, derivative, accelFn):
-    # Return a derivative
-    # accelFn is a function that takes a state object and a time val
+    # Return a derivative object for RK4.
+    # accelFn is a lambda function which can take up to two parameters - (a state and time dependent acceleration?)
+    # right now this functionality isn't used, and we assume a constant force vector.
     # and returns a dv tuple
     state = State([0,0],[0,0])
     state.pos[0] = initial.pos[0] + derivative.dPos[0] * dt
@@ -47,6 +40,7 @@ def evaluate(initial, t, dt, derivative, accelFn):
     return output
 
 def integrate(state, t, dt, accelFn):
+    # Runge Kutta integration
     a = evaluate(state, t, 0, Derivative([0,0],[0,0]), accelFn)
     b = evaluate(state, t + 0.5*dt, 0.5*dt, a, accelFn)
     c = evaluate(state, t + 0.5*dt, 0.5*dt, b, accelFn)
@@ -66,7 +60,10 @@ def integrate(state, t, dt, accelFn):
     return state
 
 if __name__ == '__main__':
-    myObj = Obj([50,100], [0,0])
-    applyForce(myObj, (2.5,10), 2.2)
-    print myObj.pos
-    print myObj.vel
+    myObj = State([50,100], [0,0])
+    force = (5,10)
+    sec = 1.0
+    print 'initial pos = ' + str(myObj.pos) + ' initial vel = ' + str(myObj.vel)
+    print 'using force = ' + str(force) + ' for ' + str(sec) + ' sec.'
+    applyConstantForce(myObj, force, sec)
+    print 'final pos = ' + str(myObj.pos) + ' final vel = ' + str(myObj.vel)
