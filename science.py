@@ -49,7 +49,7 @@ def correctWindowforBoundary(visible_window_tl, mapDimensions):
             new_visible_window_tl[i] = mapDimensions[i]*objects.TILE_SIZE[i] - resolution[i]
     return new_visible_window_tl
 
-def moveWindow(characterPosition, visible_window_tl, character_frame_size, mapDimensions):
+def moveWindow(characterPosition, visible_window_tl, mapDimensions):
     new_visible_window_tl = list(visible_window_tl)
     for i in range(2):
         if (characterPosition[i]+(objects.TILE_SIZE[i]/2)-(character_frame_size[i]/2)) < visible_window_tl[i]:
@@ -83,7 +83,7 @@ while menu:
 
 while True:
     windowSurfaceObj.fill(whiteColor)
-    visible_window_tl = moveWindow(characterObj.getPosition(), visible_window_tl, character_frame_size, mapDimensions)
+    visible_window_tl = moveWindow(characterObj.getPosition(), visible_window_tl, mapDimensions)
 
     for sprite_name, sprite_group in all_objects.iteritems():
         sprite_group.update({'mapDimensions':mapDimensions})
