@@ -4,13 +4,21 @@ import pygame
 
 dimensions = (0,0)
 data = []
+imagename = ''
+imgsurf = None
 
 def parse_map_file(filename):
-    global dimensions, data
+    global dimensions, data, imagename, imgsurf
     f = open(filename, 'r')
     data = f.readlines()
     for i in range(len(data)):
         data[i] = data[i][:-1]
+    imagename = data[0]
+    if '.png' in imagename:
+        imgsurf = pygame.image.load(imagename)
+        data = data[1:]
+    else:
+        imagename = ''
     dimensions = (len(data[0]), len(data))
     f.close()
 

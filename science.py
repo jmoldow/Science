@@ -93,6 +93,8 @@ if __name__ == '__main__':
     while True:
         windowSurfaceObj.fill(whiteColor)
         visible_window_tl = moveWindow(characterObj.getPosition(), visible_window_tl)
+        if maps.imagename:
+            windowSurfaceObj.blit(maps.imgsurf, [-coord for coord in visible_window_tl])
         objects.ScienceSprite.set_visible_window_tl(visible_window_tl)
 
         for sprite_name, sprite_group in all_objects.iteritems():
