@@ -67,23 +67,23 @@ def centerWindow(characterPosition, resolution, tile_size, mapDimensions):
 visible_window_tl = centerWindow(characterObj.getPosition(), resolution, tile_size, mapDimensions) 
 
 menu = True
-while True:
+while menu:
+    windowSurfaceObj.fill(whiteColor)
+    windowSurfaceObj.blit(menuImg, (0,0))
+    for event in pygame.event.get():
+        if event.type == MOUSEBUTTONDOWN:
+            x, y = event.pos
+            if 200 < y < 282:
+                menu = False
+            elif 355 < y < 459:
+                menu = False
+                pygame.quit()
+                sys.exit()
     if menu:
-        windowSurfaceObj.fill(whiteColor)
-        windowSurfaceObj.blit(menuImg, (0,0))
-        while menu:
-            for event in pygame.event.get():
-                if event.type == MOUSEBUTTONDOWN:
-                    x, y = event.pos
-                    if 200 < y and y < 282:
-                        menu = False
-                    if 355 < y and y < 459:
-                        menu = False
-                        pygame.quit()
-                        sys.exit()
-            pygame.display.update()
-            fpsClock.tick(100)
-            
+        pygame.display.update()
+        fpsClock.tick(100)
+
+while True:
     windowSurfaceObj.fill(whiteColor)
     visible_window_tl = moveWindow(characterObj.getPosition(), visible_window_tl, resolution, tile_size, character_frame_size, mapDimensions)
 
