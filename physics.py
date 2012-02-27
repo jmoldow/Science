@@ -5,7 +5,7 @@ def applyConstantForce(obj, forceVector, dt):
     # We don't use the advanced force-function capability yet, we just pass a constant force.
     objInitialState = State(obj.getPosition(), obj._velocity)
     objFinalState = integrate(objInitialState, 0.0, dt, (lambda s, t: forceVector))
-    obj.rect.topleft = list(objFinalState.pos)
+    obj.setPosition(objFinalState.pos)
     obj._velocity = objFinalState.vel
 
 

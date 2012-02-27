@@ -15,7 +15,7 @@ class ScienceSprite(pygame.sprite.Sprite):
     _map_char = ''
     
     def __init__(self,position,*groups):
-        self.rect = pygame.Rect(position,TILE_SIZE)
+        self.rectangle = pygame.Rect(position,TILE_SIZE)
         super(ScienceSprite,self).__init__(*groups)
     
     @classmethod
@@ -30,7 +30,11 @@ class ScienceSprite(pygame.sprite.Sprite):
     @classmethod
     def getImage(cls):
         return cls._imgsurf
-    
+
+    @property
+    def image(self):
+        return self.getImage()
+
     @classmethod
     def getMapChar(cls):
         return cls._map_char
@@ -44,23 +48,32 @@ class ScienceSprite(pygame.sprite.Sprite):
         return cls._visible_window_tl
 
     def getPosition(self):
-        return list(self.rect.topleft)
+        return list(self.rectangle.topleft)
 
     def getGlobalMapPosition(self):
         return self.getPosition()
 
     def getRelativeWindowPosition(self):
-        return [self.rect.topleft[i] - self._visible_window_tl[i] for i in range(2)]
+        return [self.rectangle.topleft[i] - self._visible_window_tl[i] for i in range(2)]
+
+    def getRelativeRect(self):
+        return pygame.Rect(self.getRelativeWindowPosition(),self.rectangle.size)
     
     def setPosition(self, position):
-        self.rect.topleft = list(position)
+        self.rectangle.topleft = list(position)
 
     def setRelativeWindowPosition(self, position):
         self.setPosition([position[i] + self._visible_window_tl[i] for i in range(2)])
-    
+
+    def setRelativeRect(self, *args, **kwargs):
+        new_rect = pygame.Rect(*args, **kwargs)
+        self.rectangle.size = new_rect.size
+        self.setRelativeWindowPosition(new_rect.topleft)
+    rect = property(getRelativeRect, setRelativeRect)
+
     def setPositionDelta(self, delta, i=-1):
         if i==-1:
-            self.rect.topleft = [self.rect.topleft[i] + delta[i] for i in range(2)]
+            self.rectangle.topleft = [self.rectangle.topleft[i] + delta[i] for i in range(2)]
         else:
             new_topleft = list(self.getPosition())
             new_topleft[i] += delta
@@ -71,7 +84,7 @@ class ScienceSprite(pygame.sprite.Sprite):
             pos = self.getRelativeWindowPosition()
             window_dims = window.get_size()
             for i in range(2):
-                if pos[i] + self.rect.size[i] < 0 or pos[i] >= window_dims[0]:
+                if pos[i] + self.rectangle.size[i] < 0 or pos[i] >= window_dims[0]:
                     return
             window.blit(self._imgsurf, pos)
 
@@ -108,15 +121,15 @@ class CharacterSprite(ScienceSprite):
         physics.applyConstantForce(self, forceVector, 0.1)        
 
         # constrain position and velocity
-        new_topleft = list(self.rect.topleft)
+        new_topleft = list(self.rectangle.topleft)
         for i in range(2):
             if new_topleft[i] < 0:
                 new_topleft[i] = 0
                 self._velocity[i] = 2
-            elif new_topleft[i] > (maps.dimensions[i]-1)*self.rect.size[i]:
-                new_topleft[i] = (maps.dimensions[i]-1)*self.rect.size[i]
+            elif new_topleft[i] > (maps.dimensions[i]-1)*self.rectangle.size[i]:
+                new_topleft[i] = (maps.dimensions[i]-1)*self.rectangle.size[i]
                 self._velocity[i] = -2
-        self.rect.topleft = new_topleft
+        self.rectangle.topleft = new_topleft
 
         # friction in horizontal direction of 5%
         self._velocity[0] *= 0.95
