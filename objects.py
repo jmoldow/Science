@@ -1,29 +1,54 @@
 import pygame
+import physics
 from pygame.locals import *
+import maps
 
 __all__ = ['ScienceSprite', 'StalactiteSprite', 'PlatformSprite', 'BackgroundPlatformSprite', 'FireSprite', 'BeakerSprite', 'StalagmiteSprite', 'SharkSprite', 'CharacterSprite']
 
 # TODO - we shouldn't have to reproduce this in both files
-keypad_to_pixel_dir_map = {K_UP:(1,-1), K_DOWN:(1,1), K_RIGHT:(0,1), K_LEFT:(0,-1)}
-dir_keys = keypad_to_pixel_dir_map.keys()
-tile_size = (32, 32)
+TILE_SIZE = (32, 32)
+keypad_direction_map = {K_UP:(0,-1), K_RIGHT:(1,0), K_LEFT:(-1,0)}
 
 class ScienceSprite(pygame.sprite.Sprite):
     
     _imagename = ''
     _map_char = ''
+    _position = [0.0,0.0]
     
-    def __init__(self,position,*args,**kwargs):
+    def __init__(self,position,*groups):
+        # it's possible we need a separate position variable that is a float
         self._position = list(position)
-        super(ScienceSprite,self).__init__(*args,**kwargs)
+        self.rectangle = pygame.Rect(position,TILE_SIZE)
+        super(ScienceSprite,self).__init__(*groups)
+    
+    @classmethod
+    def _set_imgsurf(cls):
+        if cls._imagename and not hasattr(cls,'_imgsurf'):
+            setattr(cls,'_imgsurf',pygame.image.load(cls._imagename))
     
     @classmethod
     def getImageName(cls):
         return cls._imagename
     
     @classmethod
+    def getImage(cls):
+        return cls._imgsurf
+
+    @property
+    def image(self):
+        return self.getImage()
+
+    @classmethod
     def getMapChar(cls):
         return cls._map_char
+
+    @classmethod
+    def set_visible_window_tl(cls, visible_window_tl):
+        cls._visible_window_tl = visible_window_tl
+
+    @classmethod
+    def get_visible_window_tl(cls):
+        return cls._visible_window_tl
 
     def getPosition(self):
         return self._position
@@ -31,38 +56,41 @@ class ScienceSprite(pygame.sprite.Sprite):
     def getGlobalMapPosition(self):
         return self.getPosition()
 
-    def getRelativeWindowPosition(self, visible_window_tl = [0,0]):
-        return [self._position[i] - visible_window_tl[i] for i in range(2)]
+    def getRelativeWindowPosition(self):
+        return [self.rectangle.topleft[i] - self._visible_window_tl[i] for i in range(2)]
+
+    def getRelativeRect(self):
+        return pygame.Rect(self.getRelativeWindowPosition(),self.rectangle.size)
     
     def setPosition(self, position):
+        self.rectangle.topleft = list(position)
         self._position = list(position)
 
-    def setRelativeWindowPosition(self, position, visible_window_tl = [0,0]):
-        self.setPosition([position[i] + visible_window_tl[i] for i in range(2)])
-    
+    def setRelativeWindowPosition(self, position):
+        self.setPosition([position[i] + self._visible_window_tl[i] for i in range(2)])
+
+    def setRelativeRect(self, *args, **kwargs):
+        new_rect = pygame.Rect(*args, **kwargs)
+        self.rectangle.size = new_rect.size
+        self.setRelativeWindowPosition(new_rect.topleft)
+    rect = property(getRelativeRect, setRelativeRect)
+
     def setPositionDelta(self, delta, i=-1):
         if i==-1:
-            self._position = [self._position[i] + delta[i] for i in range(2)]
+            self.rectangle.topleft = [self.rectangle.topleft[i] + delta[i] for i in range(2)]
         else:
-            self._position[i] += delta
+            new_topleft = list(self.getPosition())
+            new_topleft[i] += delta
+            self.setPosition(new_topleft)
 
-    def return_to_map(self, mapDimensions, tile_size):
-        new_position = list(self._position)
-        for i in range(2):
-            if new_position[i] < 0:
-                new_position[i] = 0
-            elif new_position[i] > (mapDimensions[i]-1)*tile_size[i]:
-                new_position[i] = (mapDimensions[i]-1)*tile_size[i]
-        self.setPosition(new_position)
-
-    def render(self, window, visible_window_tl):
+    def render(self, window):
         if self._imagename:
-            pos = self.getRelativeWindowPosition(visible_window_tl)
+            pos = self.getRelativeWindowPosition()
             window_dims = window.get_size()
             for i in range(2):
-                if pos[i] + tile_size[i] < 0 or pos[i] >= window_dims[0]:
+                if pos[i] + self.rectangle.size[i] < 0 or pos[i] >= window_dims[0]:
                     return
-            window.blit(pygame.image.load(self.getImageName()), pos)
+            window.blit(self._imgsurf, pos)
 
 class StalactiteSprite(ScienceSprite):
     _map_char = 'V'
@@ -72,7 +100,7 @@ class PlatformSprite(ScienceSprite):
     _map_char = '-'
     _imagename = 'media/images/platform.png'
 
-class BackgroundPlatformSprite(ScienceSprite):
+class BackgroundPlatformSprite(PlatformSprite):
     _map_char = 'p'
 
 class FireSprite(ScienceSprite):
@@ -94,9 +122,58 @@ class SharkSprite(ScienceSprite):
 class CharacterSprite(ScienceSprite):
     _map_char = 'C'
     _imagename = 'media/images/DraftPlayerStill.png'
+    _velocity = [0.0,0.0]
 
-    def update(self,*args):
-        for KEY in dir_keys:
-            if pygame.key.get_pressed()[KEY]:
-                self.setPositionDelta(4*keypad_to_pixel_dir_map[KEY][1],keypad_to_pixel_dir_map[KEY][0])
+    def update(self, *args):
+        # gravity
+        (outPos, outVel) = physics.applyConstantForce(self.getPosition(), self._velocity, (0.0,10.0), 0.1)
+        self.setPosition(outPos)
+        self._velocity = outVel
+        
+        # normal forces for collisions: todo
+
+        forceVector = [0.0,0.0]
+        for key in keypad_direction_map.keys():
+            if pygame.key.get_pressed()[key]:
+                forceVector[0] += 20*keypad_direction_map[key][0]
+                forceVector[1] += 20*keypad_direction_map[key][1]
+                
+        (outPos, outVel) = physics.applyConstantForce(self.getPosition(), self._velocity, forceVector, 0.1)        
+        self.setPosition(outPos)
+        self._velocity = outVel
+         
+        # constrain position and velocity
+        new_topleft = list(self.rectangle.topleft)
+        for i in range(2):
+            if new_topleft[i] < 0:
+                new_topleft[i] = 0
+                self._velocity[i] = 2
+            elif new_topleft[i] > (maps.dimensions[i]-1)*self.rectangle.size[i]:
+                new_topleft[i] = (maps.dimensions[i]-1)*self.rectangle.size[i]
+                self._velocity[i] = -2
+        self.rectangle.topleft = new_topleft
+
+        # friction in horizontal direction of 5%
+        self._velocity[0] *= 0.95
+        super(CharacterSprite,self).update(*args)
+
+    # STILL NEED TO HANDLE COLLISIONS
+    def resolveCollision(self, collidingSprites):
+        if len(collidingSprites) != 0:
+            firstCollidingSprite = collidingSprites[0]
+            dx = firstCollidingSprite.getPosition()[0] - self.getPosition()[0]
+            dy = firstCollidingSprite.getPosition()[1] - self.getPosition()[1]
+            #figure out which one is bigger
+            if abs(dx) > abs(dy):
+                self._velocity[0] *= -0.55
+                if dx > 0:
+                    self._position[0] -= 2.0
+                else:
+                    self._position[0] += 2.0
+            else:
+                self._velocity[1] *= -0.55
+                if dy > 0:
+                    self._position[1] -= 2.0
+                else:
+                    self._position[1] += 2.0
 

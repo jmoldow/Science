@@ -1,24 +1,21 @@
-def applyConstantForce(obj, forceVector, dt):
-    # This is the one to use!
-    # Obj is any object with two properties: .pos is a 2-tuple of position values, and .vel is a 2-tuple of velocity values.
-    # Force vector is a 2-tuple.
-    # We don't use the advanced force-function capability yet, we just pass a constant force.
-    objInitialState = State(obj.pos, obj.vel)
+def applyConstantForce(initPos, initVel, forceVector, dt):
+    # Given the input tuples initPos, initVel, return a vector
+    # (finalPos, finalVel) corresponding to applying a force vector for dt seconds.
+    objInitialState = State(initPos, initVel)
     objFinalState = integrate(objInitialState, 0.0, dt, (lambda s, t: forceVector))
-    obj.pos = objFinalState.pos
-    obj.vel = objFinalState.vel
+    return (objFinalState.pos, objFinalState.vel)
 
 
 class State(object):
-    pos = [0, 0]
-    vel = [0, 0]
+    pos = [0.0, 0.0]
+    vel = [0.0, 0.0]
     def __init__(self, pos, vel):
         self.pos = pos
         self.vel = vel
 
 class Derivative(object):
-    dPos = [0, 0]
-    dVel = [0, 0]
+    dPos = [0.0, 0.0]
+    dVel = [0.0, 0.0]
     def __init__(self, dPos, dVel):
         self.dPos = dPos
         self.dVel = dVel
@@ -28,20 +25,20 @@ def evaluate(initial, t, dt, derivative, accelFn):
     # accelFn is a lambda function which can take up to two parameters - (a state and time dependent acceleration?)
     # right now this functionality isn't used, and we assume a constant force vector.
     # and returns a dv tuple
-    state = State([0,0],[0,0])
+    state = State([0.0,0.0],[0.0,0.0])
     state.pos[0] = initial.pos[0] + derivative.dPos[0] * dt
     state.pos[1] = initial.pos[1] + derivative.dPos[1] * dt
     state.vel[0] = initial.vel[0] + derivative.dVel[0] * dt
     state.vel[1] = initial.vel[1] + derivative.dVel[1] * dt
 
-    output = Derivative([0,0],[0,0])
+    output = Derivative([0.0,0.0],[0.0,0.0])
     output.dPos = state.vel
     output.dVel = accelFn(state, t+dt)
     return output
 
 def integrate(state, t, dt, accelFn):
     # Runge Kutta integration
-    a = evaluate(state, t, 0, Derivative([0,0],[0,0]), accelFn)
+    a = evaluate(state, t, 0, Derivative([0.0,0.0],[0.0,0.0]), accelFn)
     b = evaluate(state, t + 0.5*dt, 0.5*dt, a, accelFn)
     c = evaluate(state, t + 0.5*dt, 0.5*dt, b, accelFn)
     d = evaluate(state, t + dt, dt, c, accelFn)
@@ -60,10 +57,10 @@ def integrate(state, t, dt, accelFn):
     return state
 
 if __name__ == '__main__':
-    myObj = State([50,100], [0,0])
-    force = (5,10)
+    myObj = State([50.0,100.0], [0.0,0.0])
+    force = (5.0,10.0)
     sec = 1.0
     print 'initial pos = ' + str(myObj.pos) + ' initial vel = ' + str(myObj.vel)
     print 'using force = ' + str(force) + ' for ' + str(sec) + ' sec.'
-    applyConstantForce(myObj, force, sec)
-    print 'final pos = ' + str(myObj.pos) + ' final vel = ' + str(myObj.vel)
+    output = applyConstantForce(myObj.pos, myObj.vel, force, sec)
+    print 'final pos = ' + str(output[0]) + ' final vel = ' + str(output[1])

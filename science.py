@@ -3,6 +3,7 @@ import pygame
 from pygame.locals import *
 import maps
 import objects
+
 # from optpartse import OptionParser
 
 if not pygame.font: print 'Warning, fonts disabled'
@@ -19,7 +20,6 @@ pygame.init()
 fpsClock = pygame.time.Clock()
 
 resolution = (640,480)
-tile_size = (32, 32)
 character_frame_size = (320,240)
 
 windowSurfaceObj = pygame.display.set_mode(resolution)
@@ -30,9 +30,15 @@ menuImg = pygame.image.load('media/images/menu.png')
 keypad_to_pixel_dir_map = {K_UP:(1,-1), K_DOWN:(1,1), K_RIGHT:(0,1), K_LEFT:(0,-1)}
 dir_keys = keypad_to_pixel_dir_map.keys()
 
-map = maps.Map(filename=mapname)
-all_objects = map.load(windowSurfaceObj, tile_size)
-mapDimensions = map.getDimensions()
+for object_name in objects.__all__:
+    object_type = getattr(objects,object_name,None)
+    if object_type is None:
+        raise Exception("You should update objects.__all__")
+    else:
+        object_type._set_imgsurf()
+
+maps.parse_map_file(filename=mapname)
+all_objects = maps.load(windowSurfaceObj)
 characterObj = None
 if len(all_objects['CharacterSprite']) == 1:
     characterObj = all_objects['CharacterSprite'].sprites()[0]
@@ -41,67 +47,77 @@ elif len(all_objects['CharacterSprite']):
 else:
     raise Exception('The map you loaded has no character starting position.')
 
-def correctWindowforBoundary(visible_window_tl, resolution, tile_size, mapDimensions):
+def correctWindowforBoundary(visible_window_tl):
     new_visible_window_tl = list(visible_window_tl)
     for i in range(2):
         if new_visible_window_tl[i] < 0:
             new_visible_window_tl[i] = 0
-        elif new_visible_window_tl[i] + resolution[i] > mapDimensions[i]*tile_size[i]:
-            new_visible_window_tl[i] = mapDimensions[i]*tile_size[i] - resolution[i]
+        elif new_visible_window_tl[i] + resolution[i] > maps.dimensions[i]*objects.TILE_SIZE[i]:
+            new_visible_window_tl[i] = maps.dimensions[i]*objects.TILE_SIZE[i] - resolution[i]
     return new_visible_window_tl
 
-def moveWindow(characterPosition, visible_window_tl, resolution, tile_size, character_frame_size, mapDimensions):
+def moveWindow(characterPosition, visible_window_tl):
     new_visible_window_tl = list(visible_window_tl)
     for i in range(2):
-        if (characterPosition[i]+(tile_size[i]/2)-(character_frame_size[i]/2)) < visible_window_tl[i]:
-            new_visible_window_tl[i] = characterPosition[i]+(tile_size[i]/2)-(character_frame_size[i]/2)
-        elif (characterPosition[i]+(tile_size[i]/2)+(character_frame_size[i]/2)) > visible_window_tl[i] + resolution[i]:
-            new_visible_window_tl[i] = characterPosition[i] + (tile_size[i]/2) + (character_frame_size[i]/2) - resolution[i]
-    return correctWindowforBoundary(new_visible_window_tl, resolution, tile_size, mapDimensions)
+        if (characterPosition[i]+(objects.TILE_SIZE[i]/2)-(character_frame_size[i]/2)) < visible_window_tl[i]:
+            new_visible_window_tl[i] = characterPosition[i]+(objects.TILE_SIZE[i]/2)-(character_frame_size[i]/2)
+        elif (characterPosition[i]+(objects.TILE_SIZE[i]/2)+(character_frame_size[i]/2)) > visible_window_tl[i] + resolution[i]:
+            new_visible_window_tl[i] = characterPosition[i] + (objects.TILE_SIZE[i]/2) + (character_frame_size[i]/2) - resolution[i]
+    return correctWindowforBoundary(new_visible_window_tl)
 
-def centerWindow(characterPosition, resolution, tile_size, mapDimensions):
-    new_visible_window_tl = [characterPosition[i]+(tile_size[i]/2)-(resolution[i]/2) for i in range(2)]
-    return correctWindowforBoundary(new_visible_window_tl, resolution, tile_size, mapDimensions)
+def centerWindow(characterPosition):
+    new_visible_window_tl = [characterPosition[i]+(objects.TILE_SIZE[i]/2)-(resolution[i]/2) for i in range(2)]
+    return correctWindowforBoundary(new_visible_window_tl)
 
-visible_window_tl = centerWindow(characterObj.getPosition(), resolution, tile_size, mapDimensions) 
+if __name__ == '__main__':
+    visible_window_tl = centerWindow(characterObj.getPosition()) 
+    objects.ScienceSprite.set_visible_window_tl(visible_window_tl)
 
-menu = True
-while menu:
-    windowSurfaceObj.fill(whiteColor)
-    windowSurfaceObj.blit(menuImg, (0,0))
-    for event in pygame.event.get():
-        if event.type == MOUSEBUTTONDOWN:
-            x, y = event.pos
-            if 200 < y < 282:
-                menu = False
-            elif 355 < y < 459:
-                menu = False
+    menu = True
+    while menu:
+        windowSurfaceObj.fill(whiteColor)
+        windowSurfaceObj.blit(menuImg, (0,0))
+        for event in pygame.event.get():
+            if event.type == MOUSEBUTTONDOWN:
+                x, y = event.pos
+                if 200 < y < 282:
+                    menu = False
+                elif 355 < y < 459:
+                    menu = False
+                    pygame.quit()
+                    sys.exit()
+        if menu:
+            pygame.display.update()
+            fpsClock.tick(100)
+
+    while True:
+        windowSurfaceObj.fill(whiteColor)
+        visible_window_tl = moveWindow(characterObj.getPosition(), visible_window_tl)
+        if maps.imagename:
+            windowSurfaceObj.blit(maps.imgsurf, [-coord for coord in visible_window_tl])
+        objects.ScienceSprite.set_visible_window_tl(visible_window_tl)
+
+        for sprite_name, sprite_group in all_objects.iteritems():
+            sprite_group.update()
+        
+        collidingSprites = []
+        spriteGroupsToCollideWith = [all_objects['PlatformSprite'], all_objects['BackgroundPlatformSprite']]
+        for spriteGroup in spriteGroupsToCollideWith:
+            collidingSprites.extend(pygame.sprite.spritecollide(characterObj, spriteGroup, False))
+            characterObj.resolveCollision(collidingSprites)
+        
+        for event in pygame.event.get():
+            if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
-    if menu:
+        
+        for sprite_name, sprite_group in all_objects.iteritems():
+            if getattr(objects,sprite_name)._imagename:
+                sprite_group.draw(windowSurfaceObj)
+        # technically, this code will render every sprite, even if it is off-screen
+        # at the moment, this doesn't seem to slow us down
+        # if this becomes an issue, we can try something else
+
+        
         pygame.display.update()
         fpsClock.tick(100)
-
-while True:
-    windowSurfaceObj.fill(whiteColor)
-    visible_window_tl = moveWindow(characterObj.getPosition(), visible_window_tl, resolution, tile_size, character_frame_size, mapDimensions)
-
-    for object_type in objects.__all__:
-        for gameObj in all_objects[object_type]:
-            gameObj.update()
-            gameObj.return_to_map(mapDimensions, tile_size)
-    
-    for event in pygame.event.get():
-        if event.type == QUIT:
-            pygame.quit()
-            sys.exit()
-    
-    for object_type in objects.__all__:
-        for gameObj in all_objects[object_type]:
-            if gameObj._imagename:
-                gameObj.render(windowSurfaceObj, visible_window_tl)
-    
-    pygame.display.update()
-    fpsClock.tick(100)
-
-
