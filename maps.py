@@ -40,6 +40,5 @@ class Map(object):
             for j in range(self.getHeight()):
                 terrain_type = self.get_terrain_type((i,j))
                 if terrain_type is not None:
-                    gameObj = terrain_type((i*width, j*height))
-                    all_objects[gameObj.__class__.__name__].add(gameObj)
+                    terrain_type((i*width, j*height),tile_size,all_objects[terrain_type.__name__])
         return all_objects

@@ -13,9 +13,9 @@ class ScienceSprite(pygame.sprite.Sprite):
     _imagename = ''
     _map_char = ''
     
-    def __init__(self,position,*args,**kwargs):
-        self._position = list(position)
-        super(ScienceSprite,self).__init__(*args,**kwargs)
+    def __init__(self,position,tile_size,*groups):
+        self.rect = pygame.Rect(position,tile_size)
+        super(ScienceSprite,self).__init__(*groups)
     
     @classmethod
     def getImageName(cls):
@@ -26,28 +26,30 @@ class ScienceSprite(pygame.sprite.Sprite):
         return cls._map_char
 
     def getPosition(self):
-        return self._position
+        return self.rect.topleft
 
     def getGlobalMapPosition(self):
         return self.getPosition()
 
     def getRelativeWindowPosition(self, visible_window_tl = [0,0]):
-        return [self._position[i] - visible_window_tl[i] for i in range(2)]
+        return [self.rect.topleft[i] - visible_window_tl[i] for i in range(2)]
     
     def setPosition(self, position):
-        self._position = list(position)
+        self.rect.topleft = list(position)
 
     def setRelativeWindowPosition(self, position, visible_window_tl = [0,0]):
         self.setPosition([position[i] + visible_window_tl[i] for i in range(2)])
     
     def setPositionDelta(self, delta, i=-1):
         if i==-1:
-            self._position = [self._position[i] + delta[i] for i in range(2)]
+            self.rect.topleft = [self.rect.topleft[i] + delta[i] for i in range(2)]
         else:
-            self._position[i] += delta
+            new_topleft = list(self.getPosition())
+            new_topleft[i] += delta
+            self.setPosition(new_topleft)
 
     def return_to_map(self, mapDimensions, tile_size):
-        new_position = list(self._position)
+        new_position = list(self.rect.topleft)
         for i in range(2):
             if new_position[i] < 0:
                 new_position[i] = 0
