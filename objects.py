@@ -76,7 +76,7 @@ class Character(GameObject):
     _imagename = 'media/images/object.png'
     _velocity = [0,0]
 
-    def logic(self, mapDimensions, tile_size, other_objects):
+    def logic(self, mapDimensions, tile_size):
         # gravity
         physics.applyConstantForce(self, (0,10), 0.1)
 
