@@ -73,7 +73,7 @@ class Stalagmite(GameObject):
 
 class Character(GameObject):
     _map_char = 'C'
-    _imagename = 'media/images/etymology_man.png'
+    _imagename = 'media/images/object.png'
 
     def logic(self):
         for KEY in dir_keys:
