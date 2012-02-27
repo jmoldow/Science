@@ -3,6 +3,7 @@ import pygame
 from pygame.locals import *
 import maps
 import objects
+
 # from optpartse import OptionParser
 
 if not pygame.font: print 'Warning, fonts disabled'
@@ -28,6 +29,13 @@ whiteColor = pygame.Color(255,255,255)
 menuImg = pygame.image.load('media/images/menu.png')
 keypad_to_pixel_dir_map = {K_UP:(1,-1), K_DOWN:(1,1), K_RIGHT:(0,1), K_LEFT:(0,-1)}
 dir_keys = keypad_to_pixel_dir_map.keys()
+
+for object_name in objects.__all__:
+    object_type = getattr(objects,object_name,None)
+    if object_type is None:
+        raise Exception("You should update objects.__all__")
+    else:
+        object_type._set_imgsurf()
 
 maps.parse_map_file(filename=mapname)
 all_objects = maps.load(windowSurfaceObj)
@@ -61,44 +69,43 @@ def centerWindow(characterPosition):
     new_visible_window_tl = [characterPosition[i]+(objects.TILE_SIZE[i]/2)-(resolution[i]/2) for i in range(2)]
     return correctWindowforBoundary(new_visible_window_tl)
 
-visible_window_tl = centerWindow(characterObj.getPosition()) 
-objects.ScienceSprite.set_visible_window_tl(visible_window_tl)
-
-menu = True
-while menu:
-    windowSurfaceObj.fill(whiteColor)
-    windowSurfaceObj.blit(menuImg, (0,0))
-    for event in pygame.event.get():
-        if event.type == MOUSEBUTTONDOWN:
-            x, y = event.pos
-            if 200 < y < 282:
-                menu = False
-            elif 355 < y < 459:
-                menu = False
-                pygame.quit()
-                sys.exit()
-    if menu:
-        pygame.display.update()
-        fpsClock.tick(100)
-
-while True:
-    windowSurfaceObj.fill(whiteColor)
-    visible_window_tl = moveWindow(characterObj.getPosition(), visible_window_tl)
+if __name__ == '__main__':
+    visible_window_tl = centerWindow(characterObj.getPosition()) 
     objects.ScienceSprite.set_visible_window_tl(visible_window_tl)
 
-    for sprite_name, sprite_group in all_objects.iteritems():
-        sprite_group.update()
-    
-    for event in pygame.event.get():
-        if event.type == QUIT:
-            pygame.quit()
-            sys.exit()
-    
-    for object_type in objects.__all__:
-        for gameObj in all_objects[object_type]:
-            gameObj.render(windowSurfaceObj)
-    
-    pygame.display.update()
-    fpsClock.tick(100)
+    menu = True
+    while menu:
+        windowSurfaceObj.fill(whiteColor)
+        windowSurfaceObj.blit(menuImg, (0,0))
+        for event in pygame.event.get():
+            if event.type == MOUSEBUTTONDOWN:
+                x, y = event.pos
+                if 200 < y < 282:
+                    menu = False
+                elif 355 < y < 459:
+                    menu = False
+                    pygame.quit()
+                    sys.exit()
+        if menu:
+            pygame.display.update()
+            fpsClock.tick(100)
 
+    while True:
+        windowSurfaceObj.fill(whiteColor)
+        visible_window_tl = moveWindow(characterObj.getPosition(), visible_window_tl)
+        objects.ScienceSprite.set_visible_window_tl(visible_window_tl)
 
+        for sprite_name, sprite_group in all_objects.iteritems():
+            sprite_group.update()
+        
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+        
+        for object_type in objects.__all__:
+            for gameObj in all_objects[object_type]:
+                gameObj.render(windowSurfaceObj)
+        
+        pygame.display.update()
+        fpsClock.tick(100)

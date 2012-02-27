@@ -3,10 +3,10 @@ def applyConstantForce(obj, forceVector, dt):
     # Obj is any object with two properties: .pos is a 2-tuple of position values, and .vel is a 2-tuple of velocity values.
     # Force vector is a 2-tuple.
     # We don't use the advanced force-function capability yet, we just pass a constant force.
-    objInitialState = State(obj.pos, obj.vel)
+    objInitialState = State(obj.getPosition(), obj._velocity)
     objFinalState = integrate(objInitialState, 0.0, dt, (lambda s, t: forceVector))
-    obj.pos = objFinalState.pos
-    obj.vel = objFinalState.vel
+    obj.rect.topleft = list(objFinalState.pos)
+    obj._velocity = objFinalState.vel
 
 
 class State(object):

@@ -1,13 +1,13 @@
 import pygame
+import physics
 from pygame.locals import *
 import maps
 
 __all__ = ['ScienceSprite', 'StalactiteSprite', 'PlatformSprite', 'StalagmiteSprite', 'CharacterSprite']
 
 # TODO - we shouldn't have to reproduce this in both files
-keypad_to_pixel_dir_map = {K_UP:(1,-1), K_DOWN:(1,1), K_RIGHT:(0,1), K_LEFT:(0,-1)}
-dir_keys = keypad_to_pixel_dir_map.keys()
 TILE_SIZE = (32, 32)
+keypad_direction_map = {K_UP:(0,-1), K_RIGHT:(1,0), K_LEFT:(-1,0)}
 
 class ScienceSprite(pygame.sprite.Sprite):
     
@@ -19,8 +19,17 @@ class ScienceSprite(pygame.sprite.Sprite):
         super(ScienceSprite,self).__init__(*groups)
     
     @classmethod
+    def _set_imgsurf(cls):
+        if cls._imagename and not hasattr(cls,'_imgsurf'):
+            setattr(cls,'_imgsurf',pygame.image.load(cls._imagename))
+    
+    @classmethod
     def getImageName(cls):
         return cls._imagename
+    
+    @classmethod
+    def getImage(cls):
+        return cls._imgsurf
     
     @classmethod
     def getMapChar(cls):
@@ -35,7 +44,7 @@ class ScienceSprite(pygame.sprite.Sprite):
         return cls._visible_window_tl
 
     def getPosition(self):
-        return self.rect.topleft
+        return list(self.rect.topleft)
 
     def getGlobalMapPosition(self):
         return self.getPosition()
@@ -57,18 +66,6 @@ class ScienceSprite(pygame.sprite.Sprite):
             new_topleft[i] += delta
             self.setPosition(new_topleft)
 
-    def return_to_map(self):
-        new_position = list(self.rect.topleft)
-        for i in range(2):
-            if new_position[i] < 0:
-                new_position[i] = 0
-            elif new_position[i] > (maps.dimensions[i]-1)*self.rect.size[i]:
-                new_position[i] = (maps.dimensions[i]-1)*self.rect.size[i]
-        self.setPosition(new_position)
-    
-    def update(self, *args):
-        self.return_to_map()
-
     def render(self, window):
         if self._imagename:
             pos = self.getRelativeWindowPosition()
@@ -76,7 +73,7 @@ class ScienceSprite(pygame.sprite.Sprite):
             for i in range(2):
                 if pos[i] + self.rect.size[i] < 0 or pos[i] >= window_dims[0]:
                     return
-            window.blit(pygame.image.load(self.getImageName()), pos)
+            window.blit(self._imgsurf, pos)
 
 class StalactiteSprite(ScienceSprite):
     _map_char = 'V'
@@ -94,9 +91,35 @@ class CharacterSprite(ScienceSprite):
     _map_char = 'C'
     _imagename = 'media/images/object.png'
 
-    def update(self,*args):
-        for KEY in dir_keys:
-            if pygame.key.get_pressed()[KEY]:
-                self.setPositionDelta(4*keypad_to_pixel_dir_map[KEY][1],keypad_to_pixel_dir_map[KEY][0])
+    _velocity = [0,0]
+
+    def update(self, *args):
+        # gravity
+        physics.applyConstantForce(self, (0,10), 0.1)
+
+        # normal forces for collisions: todo
+
+        forceVector = [0,0]
+        for key in keypad_direction_map.keys():
+            if pygame.key.get_pressed()[key]:
+                forceVector[0] += 20*keypad_direction_map[key][0]
+                forceVector[1] += 20*keypad_direction_map[key][1]
+                
+        physics.applyConstantForce(self, forceVector, 0.1)        
+
+        # constrain position and velocity
+        new_topleft = list(self.rect.topleft)
+        for i in range(2):
+            if new_topleft[i] < 0:
+                new_topleft[i] = 0
+                self._velocity[i] = 2
+            elif new_topleft[i] > (maps.dimensions[i]-1)*self.rect.size[i]:
+                new_topleft[i] = (maps.dimensions[i]-1)*self.rect.size[i]
+                self._velocity[i] = -2
+        self.rect.topleft = new_topleft
+
+        # friction in horizontal direction of 5%
+        self._velocity[0] *= 0.95
         super(CharacterSprite,self).update(*args)
 
+        # STILL NEED TO HANDLE COLLISIONS
