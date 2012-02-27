@@ -57,23 +57,26 @@ class GameObject(object):
 
     def render(self, window, visible_window_tl):
         if self._imagename:
-            window.blit(pygame.image.load(self.getImageName()), self.getRelativeWindowPosition(visible_window_tl))
+            window.blit(self._imgsurf, self.getRelativeWindowPosition(visible_window_tl))
 
 class Stalactite(GameObject):
     _map_char = 'V'
     _imagename = 'media/images/stalactite.png'
+    _imgsurf = pygame.image.load(_imagename)
 
 class Platform(GameObject):
     _map_char = '-'
     _imagename = 'media/images/platform.png'
+    _imgsurf = pygame.image.load(_imagename)    
 
 class Stalagmite(GameObject):
     _map_char = '^'
     _imagename = 'media/images/stalagmite.png'
-
+    _imgsurf = pygame.image.load(_imagename)
 class Character(GameObject):
     _map_char = 'C'
     _imagename = 'media/images/object.png'
+    _imgsurf = pygame.image.load(_imagename)
     _velocity = [0,0]
 
     def logic(self, mapDimensions, tile_size):
