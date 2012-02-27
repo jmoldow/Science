@@ -98,7 +98,8 @@ while True:
     
     for object_type in objects.__all__:
         for gameObj in all_objects[object_type]:
-            gameObj.render(windowSurfaceObj, visible_window_tl)
+            if gameObj._imagename:
+                gameObj.render(windowSurfaceObj, visible_window_tl)
     
     pygame.display.update()
     fpsClock.tick(100)
