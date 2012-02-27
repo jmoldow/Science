@@ -3,8 +3,10 @@ from pygame.locals import *
 
 __all__ = ['GameObject', 'Stalactite', 'Platform', 'Stalagmite', 'Character']
 
+# TODO - we shouldn't have to reproduce this in both files
 keypad_to_pixel_dir_map = {K_UP:(1,-1), K_DOWN:(1,1), K_RIGHT:(0,1), K_LEFT:(0,-1)}
 dir_keys = keypad_to_pixel_dir_map.keys()
+tile_size = (32, 32)
 
 class GameObject(object):
     
@@ -57,7 +59,12 @@ class GameObject(object):
 
     def render(self, window, visible_window_tl):
         if self._imagename:
-            window.blit(pygame.image.load(self.getImageName()), self.getRelativeWindowPosition(visible_window_tl))
+            pos = self.getRelativeWindowPosition(visible_window_tl)
+            window_dims = window.get_size()
+            for i in range(2):
+                if pos[i] + tile_size[i] < 0 or pos[i] >= window_dims[0]:
+                    return
+            window.blit(pygame.image.load(self.getImageName()), pos)
 
 class Stalactite(GameObject):
     _map_char = 'V'
