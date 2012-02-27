@@ -13,8 +13,11 @@ class ScienceSprite(pygame.sprite.Sprite):
     
     _imagename = ''
     _map_char = ''
+    _position = [0.0,0.0]
     
     def __init__(self,position,*groups):
+        # it's possible we need a separate position variable that is a float
+        self._position = list(position)
         self.rectangle = pygame.Rect(position,TILE_SIZE)
         super(ScienceSprite,self).__init__(*groups)
     
@@ -48,7 +51,7 @@ class ScienceSprite(pygame.sprite.Sprite):
         return cls._visible_window_tl
 
     def getPosition(self):
-        return list(self.rectangle.topleft)
+        return self._position
 
     def getGlobalMapPosition(self):
         return self.getPosition()
@@ -61,6 +64,7 @@ class ScienceSprite(pygame.sprite.Sprite):
     
     def setPosition(self, position):
         self.rectangle.topleft = list(position)
+        self._position = list(position)
 
     def setRelativeWindowPosition(self, position):
         self.setPosition([position[i] + self._visible_window_tl[i] for i in range(2)])
@@ -104,22 +108,26 @@ class CharacterSprite(ScienceSprite):
     _map_char = 'C'
     _imagename = 'media/images/object.png'
 
-    _velocity = [0,0]
+    _velocity = [0.0,0.0]
 
     def update(self, *args):
         # gravity
-        physics.applyConstantForce(self, (0,10), 0.1)
-
+        (outPos, outVel) = physics.applyConstantForce(self.getPosition(), self._velocity, (0.0,10.0), 0.1)
+        self.setPosition(outPos)
+        self._velocity = outVel
+        
         # normal forces for collisions: todo
 
-        forceVector = [0,0]
+        forceVector = [0.0,0.0]
         for key in keypad_direction_map.keys():
             if pygame.key.get_pressed()[key]:
                 forceVector[0] += 20*keypad_direction_map[key][0]
                 forceVector[1] += 20*keypad_direction_map[key][1]
                 
-        physics.applyConstantForce(self, forceVector, 0.1)        
-
+        (outPos, outVel) = physics.applyConstantForce(self.getPosition(), self._velocity, forceVector, 0.1)        
+        self.setPosition(outPos)
+        self._velocity = outVel
+         
         # constrain position and velocity
         new_topleft = list(self.rectangle.topleft)
         for i in range(2):
