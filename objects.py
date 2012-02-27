@@ -106,7 +106,7 @@ class StalagmiteSprite(ScienceSprite):
 
 class CharacterSprite(ScienceSprite):
     _map_char = 'C'
-    _imagename = 'media/images/object.png'
+    _imagename = 'media/images/DraftPlayerStill.png'
 
     _velocity = [0.0,0.0]
 
