@@ -98,6 +98,13 @@ if __name__ == '__main__':
         for sprite_name, sprite_group in all_objects.iteritems():
             sprite_group.update()
         
+        collidingSprites = []
+        for spriteGroupKey in all_objects.keys():
+            if spriteGroupKey == 'PlatformSprite':
+                spriteGroup = all_objects[spriteGroupKey]
+                collidingSprites.extend(pygame.sprite.spritecollide(characterObj, spriteGroup, False))
+        characterObj.resolveCollision(collidingSprites)
+        
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
