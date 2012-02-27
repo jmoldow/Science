@@ -1,5 +1,6 @@
 import objects
 from collections import defaultdict
+import pygame
 
 class Map(object):
 
@@ -30,13 +31,13 @@ class Map(object):
                 raise Exception("You should update objects.__all__")
             if char == object_type.getMapChar():
                 return object_type
-        return objects.GameObject
+        return objects.ScienceSprite
 
     def load(self, window, tile_size):
         width, height = tile_size
-        all_objects = defaultdict(list)
+        all_objects = defaultdict(pygame.sprite.Group)
         for i in range(self.getWidth()):
             for j in range(self.getHeight()):
                 gameObj = self.get_terrain_type((i,j))((i*width, j*height))
-                all_objects[gameObj.__class__.__name__].append(gameObj)
+                all_objects[gameObj.__class__.__name__].add(gameObj)
         return all_objects

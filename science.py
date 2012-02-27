@@ -34,10 +34,10 @@ map = maps.Map(filename=mapname)
 all_objects = map.load(windowSurfaceObj, tile_size)
 mapDimensions = map.getDimensions()
 characterObj = None
-if len(all_objects['Character']) == 1:
-    characterObj = all_objects['Character'][0]
-    all_objects['GameObject'].append(objects.GameObject(characterObj.getPosition()))
-elif len(all_objects['Character']):
+if len(all_objects['CharacterSprite']) == 1:
+    characterObj = all_objects['CharacterSprite'].sprites()[0]
+    all_objects['ScienceSprite'].add(objects.ScienceSprite(characterObj.getPosition()))
+elif len(all_objects['CharacterSprite']):
     raise Exception('The map you loaded has more than two character starting positions.')
 else:
     raise Exception('The map you loaded has no character starting position.')
@@ -89,7 +89,7 @@ while True:
 
     for object_type in objects.__all__:
         for gameObj in all_objects[object_type]:
-            gameObj.logic()
+            gameObj.update()
             gameObj.return_to_map(mapDimensions, tile_size)
     
     for event in pygame.event.get():
