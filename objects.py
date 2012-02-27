@@ -100,7 +100,7 @@ class PlatformSprite(ScienceSprite):
     _map_char = '-'
     _imagename = 'media/images/platform.png'
 
-class BackgroundPlatformSprite(ScienceSprite):
+class BackgroundPlatformSprite(PlatformSprite):
     _map_char = 'p'
 
 class FireSprite(ScienceSprite):
