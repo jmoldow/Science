@@ -26,20 +26,28 @@ class ScienceSprite(pygame.sprite.Sprite):
     def getMapChar(cls):
         return cls._map_char
 
+    @classmethod
+    def set_visible_window_tl(cls, visible_window_tl):
+        cls._visible_window_tl = visible_window_tl
+
+    @classmethod
+    def get_visible_window_tl(cls):
+        return cls._visible_window_tl
+
     def getPosition(self):
         return self.rect.topleft
 
     def getGlobalMapPosition(self):
         return self.getPosition()
 
-    def getRelativeWindowPosition(self, visible_window_tl = [0,0]):
-        return [self.rect.topleft[i] - visible_window_tl[i] for i in range(2)]
+    def getRelativeWindowPosition(self):
+        return [self.rect.topleft[i] - self._visible_window_tl[i] for i in range(2)]
     
     def setPosition(self, position):
         self.rect.topleft = list(position)
 
-    def setRelativeWindowPosition(self, position, visible_window_tl = [0,0]):
-        self.setPosition([position[i] + visible_window_tl[i] for i in range(2)])
+    def setRelativeWindowPosition(self, position):
+        self.setPosition([position[i] + self._visible_window_tl[i] for i in range(2)])
     
     def setPositionDelta(self, delta, i=-1):
         if i==-1:
@@ -61,9 +69,9 @@ class ScienceSprite(pygame.sprite.Sprite):
     def update(self, *args):
         self.return_to_map()
 
-    def render(self, window, visible_window_tl):
+    def render(self, window):
         if self._imagename:
-            pos = self.getRelativeWindowPosition(visible_window_tl)
+            pos = self.getRelativeWindowPosition()
             window_dims = window.get_size()
             for i in range(2):
                 if pos[i] + self.rect.size[i] < 0 or pos[i] >= window_dims[0]:

@@ -62,6 +62,7 @@ def centerWindow(characterPosition):
     return correctWindowforBoundary(new_visible_window_tl)
 
 visible_window_tl = centerWindow(characterObj.getPosition()) 
+objects.ScienceSprite.set_visible_window_tl(visible_window_tl)
 
 menu = True
 while menu:
@@ -83,6 +84,7 @@ while menu:
 while True:
     windowSurfaceObj.fill(whiteColor)
     visible_window_tl = moveWindow(characterObj.getPosition(), visible_window_tl)
+    objects.ScienceSprite.set_visible_window_tl(visible_window_tl)
 
     for sprite_name, sprite_group in all_objects.iteritems():
         sprite_group.update()
@@ -94,7 +96,7 @@ while True:
     
     for object_type in objects.__all__:
         for gameObj in all_objects[object_type]:
-            gameObj.render(windowSurfaceObj, visible_window_tl)
+            gameObj.render(windowSurfaceObj)
     
     pygame.display.update()
     fpsClock.tick(100)
