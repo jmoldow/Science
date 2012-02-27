@@ -104,7 +104,8 @@ if __name__ == '__main__':
                 sys.exit()
         
         for sprite_name, sprite_group in all_objects.iteritems():
-            sprite_group.draw(windowSurfaceObj)
+            if getattr(objects,sprite_name)._imagename:
+                sprite_group.draw(windowSurfaceObj)
         # technically, this code will render every sprite, even if it is off-screen
         # at the moment, this doesn't seem to slow us down
         # if this becomes an issue, we can try something else
