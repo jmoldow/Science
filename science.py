@@ -20,7 +20,7 @@ fpsClock = pygame.time.Clock()
 
 resolution = (640,480)
 tile_size = (32, 32)
-character_frame_size = (160,160)
+character_frame_size = (320,240)
 
 windowSurfaceObj = pygame.display.set_mode(resolution)
 pygame.display.set_caption('Science!')
