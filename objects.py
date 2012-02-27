@@ -1,5 +1,6 @@
 import pygame
 from pygame.locals import *
+import maps
 
 __all__ = ['ScienceSprite', 'StalactiteSprite', 'PlatformSprite', 'StalagmiteSprite', 'CharacterSprite']
 
@@ -48,19 +49,17 @@ class ScienceSprite(pygame.sprite.Sprite):
             new_topleft[i] += delta
             self.setPosition(new_topleft)
 
-    def return_to_map(self, mapDimensions):
+    def return_to_map(self):
         new_position = list(self.rect.topleft)
         for i in range(2):
             if new_position[i] < 0:
                 new_position[i] = 0
-            elif new_position[i] > (mapDimensions[i]-1)*self.rect.size[i]:
-                new_position[i] = (mapDimensions[i]-1)*self.rect.size[i]
+            elif new_position[i] > (maps.dimensions[i]-1)*self.rect.size[i]:
+                new_position[i] = (maps.dimensions[i]-1)*self.rect.size[i]
         self.setPosition(new_position)
     
     def update(self, *args):
-        kwargs = args[0]
-        mapDimensions = kwargs['mapDimensions']
-        self.return_to_map(mapDimensions)
+        self.return_to_map()
 
     def render(self, window, visible_window_tl):
         if self._imagename:

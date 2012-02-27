@@ -29,9 +29,8 @@ menuImg = pygame.image.load('media/images/menu.png')
 keypad_to_pixel_dir_map = {K_UP:(1,-1), K_DOWN:(1,1), K_RIGHT:(0,1), K_LEFT:(0,-1)}
 dir_keys = keypad_to_pixel_dir_map.keys()
 
-map = maps.Map(filename=mapname)
-all_objects = map.load(windowSurfaceObj)
-mapDimensions = map.getDimensions()
+maps.parse_map_file(filename=mapname)
+all_objects = maps.load(windowSurfaceObj)
 characterObj = None
 if len(all_objects['CharacterSprite']) == 1:
     characterObj = all_objects['CharacterSprite'].sprites()[0]
@@ -40,29 +39,29 @@ elif len(all_objects['CharacterSprite']):
 else:
     raise Exception('The map you loaded has no character starting position.')
 
-def correctWindowforBoundary(visible_window_tl, mapDimensions):
+def correctWindowforBoundary(visible_window_tl):
     new_visible_window_tl = list(visible_window_tl)
     for i in range(2):
         if new_visible_window_tl[i] < 0:
             new_visible_window_tl[i] = 0
-        elif new_visible_window_tl[i] + resolution[i] > mapDimensions[i]*objects.TILE_SIZE[i]:
-            new_visible_window_tl[i] = mapDimensions[i]*objects.TILE_SIZE[i] - resolution[i]
+        elif new_visible_window_tl[i] + resolution[i] > maps.dimensions[i]*objects.TILE_SIZE[i]:
+            new_visible_window_tl[i] = maps.dimensions[i]*objects.TILE_SIZE[i] - resolution[i]
     return new_visible_window_tl
 
-def moveWindow(characterPosition, visible_window_tl, mapDimensions):
+def moveWindow(characterPosition, visible_window_tl):
     new_visible_window_tl = list(visible_window_tl)
     for i in range(2):
         if (characterPosition[i]+(objects.TILE_SIZE[i]/2)-(character_frame_size[i]/2)) < visible_window_tl[i]:
             new_visible_window_tl[i] = characterPosition[i]+(objects.TILE_SIZE[i]/2)-(character_frame_size[i]/2)
         elif (characterPosition[i]+(objects.TILE_SIZE[i]/2)+(character_frame_size[i]/2)) > visible_window_tl[i] + resolution[i]:
             new_visible_window_tl[i] = characterPosition[i] + (objects.TILE_SIZE[i]/2) + (character_frame_size[i]/2) - resolution[i]
-    return correctWindowforBoundary(new_visible_window_tl, mapDimensions)
+    return correctWindowforBoundary(new_visible_window_tl)
 
-def centerWindow(characterPosition, mapDimensions):
+def centerWindow(characterPosition):
     new_visible_window_tl = [characterPosition[i]+(objects.TILE_SIZE[i]/2)-(resolution[i]/2) for i in range(2)]
-    return correctWindowforBoundary(new_visible_window_tl, mapDimensions)
+    return correctWindowforBoundary(new_visible_window_tl)
 
-visible_window_tl = centerWindow(characterObj.getPosition(), mapDimensions) 
+visible_window_tl = centerWindow(characterObj.getPosition()) 
 
 menu = True
 while menu:
@@ -83,10 +82,10 @@ while menu:
 
 while True:
     windowSurfaceObj.fill(whiteColor)
-    visible_window_tl = moveWindow(characterObj.getPosition(), visible_window_tl, mapDimensions)
+    visible_window_tl = moveWindow(characterObj.getPosition(), visible_window_tl)
 
     for sprite_name, sprite_group in all_objects.iteritems():
-        sprite_group.update({'mapDimensions':mapDimensions})
+        sprite_group.update()
     
     for event in pygame.event.get():
         if event.type == QUIT:
