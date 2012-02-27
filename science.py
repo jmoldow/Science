@@ -36,7 +36,6 @@ mapDimensions = map.getDimensions()
 characterObj = None
 if len(all_objects['CharacterSprite']) == 1:
     characterObj = all_objects['CharacterSprite'].sprites()[0]
-    all_objects['ScienceSprite'].add(objects.ScienceSprite(characterObj.getPosition()))
 elif len(all_objects['CharacterSprite']):
     raise Exception('The map you loaded has more than two character starting positions.')
 else:
