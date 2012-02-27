@@ -31,6 +31,13 @@ menuImg = pygame.image.load('media/images/menu.png')
 keypad_to_pixel_dir_map = {K_UP:(1,-1), K_DOWN:(1,1), K_RIGHT:(0,1), K_LEFT:(0,-1)}
 dir_keys = keypad_to_pixel_dir_map.keys()
 
+for object_name in objects.__all__:
+    object_type = getattr(objects,object_name,None)
+    if object_type is None:
+        raise Exception("You should update objects.__all__")
+    else:
+        object_type._set_imgsurf()
+
 map = maps.Map(filename=mapname)
 all_objects = map.load(windowSurfaceObj, tile_size)
 mapDimensions = map.getDimensions()
