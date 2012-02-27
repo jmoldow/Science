@@ -3,6 +3,7 @@ import pygame
 from pygame.locals import *
 import maps
 import objects
+
 # from optpartse import OptionParser
 
 if not pygame.font: print 'Warning, fonts disabled'
@@ -63,45 +64,42 @@ def moveWindow(characterPosition, visible_window_tl, resolution, tile_size, char
 def centerWindow(characterPosition, resolution, tile_size, mapDimensions):
     new_visible_window_tl = [characterPosition[i]+(tile_size[i]/2)-(resolution[i]/2) for i in range(2)]
     return correctWindowforBoundary(new_visible_window_tl, resolution, tile_size, mapDimensions)
-
-visible_window_tl = centerWindow(characterObj.getPosition(), resolution, tile_size, mapDimensions) 
-
-menu = True
-while True:
-    if menu:
+if __name__ == '__main__':
+        
+    visible_window_tl = centerWindow(characterObj.getPosition(), resolution, tile_size, mapDimensions) 
+    menu = True
+    while menu:
         windowSurfaceObj.fill(whiteColor)
         windowSurfaceObj.blit(menuImg, (0,0))
-        while menu:
-            for event in pygame.event.get():
-                if event.type == MOUSEBUTTONDOWN:
-                    x, y = event.pos
-                    if 200 < y and y < 282:
-                        menu = False
-                    if 355 < y and y < 459:
-                        menu = False
-                        pygame.quit()
-                        sys.exit()
-            pygame.display.update()
-            fpsClock.tick(100)
-            
-    windowSurfaceObj.fill(whiteColor)
-    visible_window_tl = moveWindow(characterObj.getPosition(), visible_window_tl, resolution, tile_size, character_frame_size, mapDimensions)
+        for event in pygame.event.get():
+            if event.type == MOUSEBUTTONDOWN:
+                x, y = event.pos
+                if 200 < y and y < 282:
+                    menu = False
+                if 355 < y and y < 459:
+                    menu = False
+                    pygame.quit()
+                    sys.exit()
+        pygame.display.update()
+        fpsClock.tick(100)
 
-    for object_type in objects.__all__:
-        for gameObj in all_objects[object_type]:
-            gameObj.logic()
-            gameObj.return_to_map(mapDimensions, tile_size)
-    
-    for event in pygame.event.get():
-        if event.type == QUIT:
-            pygame.quit()
-            sys.exit()
-    
-    for object_type in objects.__all__:
-        for gameObj in all_objects[object_type]:
-            gameObj.render(windowSurfaceObj, visible_window_tl)
-    
-    pygame.display.update()
-    fpsClock.tick(100)
+    while True:
+        windowSurfaceObj.fill(whiteColor)
+        visible_window_tl = moveWindow(characterObj.getPosition(), visible_window_tl, resolution, tile_size, character_frame_size, mapDimensions)
 
+        for object_type in objects.__all__:
+            for gameObj in all_objects[object_type]:
+                gameObj.logic(mapDimensions, tile_size)
+        
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+        
+        for object_type in objects.__all__:
+            for gameObj in all_objects[object_type]:
+                gameObj.render(windowSurfaceObj, visible_window_tl)
+        
+        pygame.display.update()
+        fpsClock.tick(100)
 
