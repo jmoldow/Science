@@ -93,6 +93,8 @@ if __name__ == '__main__':
     while True:
         windowSurfaceObj.fill(whiteColor)
         visible_window_tl = moveWindow(characterObj.getPosition(), visible_window_tl)
+        if maps.imagename:
+            windowSurfaceObj.blit(maps.imgsurf, [-coord for coord in visible_window_tl])
         objects.ScienceSprite.set_visible_window_tl(visible_window_tl)
 
         for sprite_name, sprite_group in all_objects.iteritems():
@@ -111,7 +113,8 @@ if __name__ == '__main__':
                 sys.exit()
         
         for sprite_name, sprite_group in all_objects.iteritems():
-            sprite_group.draw(windowSurfaceObj)
+            if getattr(objects,sprite_name)._imagename:
+                sprite_group.draw(windowSurfaceObj)
         # technically, this code will render every sprite, even if it is off-screen
         # at the moment, this doesn't seem to slow us down
         # if this becomes an issue, we can try something else
