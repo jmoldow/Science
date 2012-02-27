@@ -107,7 +107,6 @@ class StalagmiteSprite(ScienceSprite):
 class CharacterSprite(ScienceSprite):
     _map_char = 'C'
     _imagename = 'media/images/DraftPlayerStill.png'
-
     _velocity = [0.0,0.0]
 
     def update(self, *args):
@@ -143,4 +142,25 @@ class CharacterSprite(ScienceSprite):
         self._velocity[0] *= 0.95
         super(CharacterSprite,self).update(*args)
 
-        # STILL NEED TO HANDLE COLLISIONS
+    # STILL NEED TO HANDLE COLLISIONS
+    def resolveCollision(self, collidingSprites):
+        if len(collidingSprites) == 0:
+            print '.'
+        else:
+            firstCollidingSprite = collidingSprites[0]
+            dx = firstCollidingSprite.getPosition()[0] - self.getPosition()[0]
+            dy = firstCollidingSprite.getPosition()[1] - self.getPosition()[1]
+            #figure out which one is bigger
+            if abs(dx) > abs(dy):
+                self._velocity[0] *= -0.55
+                if dx > 0:
+                    self._position[0] -= 2.0
+                else:
+                    self._position[0] += 2.0
+            else:
+                self._velocity[1] *= -0.55
+                if dy > 0:
+                    self._position[1] -= 2.0
+                else:
+                    self._position[1] += 2.0
+
