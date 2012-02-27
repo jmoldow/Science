@@ -6,15 +6,15 @@ __all__ = ['ScienceSprite', 'StalactiteSprite', 'PlatformSprite', 'StalagmiteSpr
 # TODO - we shouldn't have to reproduce this in both files
 keypad_to_pixel_dir_map = {K_UP:(1,-1), K_DOWN:(1,1), K_RIGHT:(0,1), K_LEFT:(0,-1)}
 dir_keys = keypad_to_pixel_dir_map.keys()
-tile_size = (32, 32)
+TILE_SIZE = (32, 32)
 
 class ScienceSprite(pygame.sprite.Sprite):
     
     _imagename = ''
     _map_char = ''
     
-    def __init__(self,position,tile_size,*groups):
-        self.rect = pygame.Rect(position,tile_size)
+    def __init__(self,position,*groups):
+        self.rect = pygame.Rect(position,TILE_SIZE)
         super(ScienceSprite,self).__init__(*groups)
     
     @classmethod
@@ -48,27 +48,26 @@ class ScienceSprite(pygame.sprite.Sprite):
             new_topleft[i] += delta
             self.setPosition(new_topleft)
 
-    def return_to_map(self, mapDimensions, tile_size):
+    def return_to_map(self, mapDimensions):
         new_position = list(self.rect.topleft)
         for i in range(2):
             if new_position[i] < 0:
                 new_position[i] = 0
-            elif new_position[i] > (mapDimensions[i]-1)*tile_size[i]:
-                new_position[i] = (mapDimensions[i]-1)*tile_size[i]
+            elif new_position[i] > (mapDimensions[i]-1)*self.rect.size[i]:
+                new_position[i] = (mapDimensions[i]-1)*self.rect.size[i]
         self.setPosition(new_position)
     
     def update(self, *args):
         kwargs = args[0]
         mapDimensions = kwargs['mapDimensions']
-        tile_size = kwargs['tile_size']
-        self.return_to_map(mapDimensions, tile_size)
+        self.return_to_map(mapDimensions)
 
     def render(self, window, visible_window_tl):
         if self._imagename:
             pos = self.getRelativeWindowPosition(visible_window_tl)
             window_dims = window.get_size()
             for i in range(2):
-                if pos[i] + tile_size[i] < 0 or pos[i] >= window_dims[0]:
+                if pos[i] + self.rect.size[i] < 0 or pos[i] >= window_dims[0]:
                     return
             window.blit(pygame.image.load(self.getImageName()), pos)
 

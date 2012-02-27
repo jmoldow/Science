@@ -19,7 +19,6 @@ pygame.init()
 fpsClock = pygame.time.Clock()
 
 resolution = (640,480)
-tile_size = (32, 32)
 character_frame_size = (320,240)
 
 windowSurfaceObj = pygame.display.set_mode(resolution)
@@ -31,7 +30,7 @@ keypad_to_pixel_dir_map = {K_UP:(1,-1), K_DOWN:(1,1), K_RIGHT:(0,1), K_LEFT:(0,-
 dir_keys = keypad_to_pixel_dir_map.keys()
 
 map = maps.Map(filename=mapname)
-all_objects = map.load(windowSurfaceObj, tile_size)
+all_objects = map.load(windowSurfaceObj)
 mapDimensions = map.getDimensions()
 characterObj = None
 if len(all_objects['CharacterSprite']) == 1:
@@ -41,29 +40,29 @@ elif len(all_objects['CharacterSprite']):
 else:
     raise Exception('The map you loaded has no character starting position.')
 
-def correctWindowforBoundary(visible_window_tl, resolution, tile_size, mapDimensions):
+def correctWindowforBoundary(visible_window_tl, resolution, mapDimensions):
     new_visible_window_tl = list(visible_window_tl)
     for i in range(2):
         if new_visible_window_tl[i] < 0:
             new_visible_window_tl[i] = 0
-        elif new_visible_window_tl[i] + resolution[i] > mapDimensions[i]*tile_size[i]:
-            new_visible_window_tl[i] = mapDimensions[i]*tile_size[i] - resolution[i]
+        elif new_visible_window_tl[i] + resolution[i] > mapDimensions[i]*objects.TILE_SIZE[i]:
+            new_visible_window_tl[i] = mapDimensions[i]*objects.TILE_SIZE[i] - resolution[i]
     return new_visible_window_tl
 
-def moveWindow(characterPosition, visible_window_tl, resolution, tile_size, character_frame_size, mapDimensions):
+def moveWindow(characterPosition, visible_window_tl, resolution, character_frame_size, mapDimensions):
     new_visible_window_tl = list(visible_window_tl)
     for i in range(2):
-        if (characterPosition[i]+(tile_size[i]/2)-(character_frame_size[i]/2)) < visible_window_tl[i]:
-            new_visible_window_tl[i] = characterPosition[i]+(tile_size[i]/2)-(character_frame_size[i]/2)
-        elif (characterPosition[i]+(tile_size[i]/2)+(character_frame_size[i]/2)) > visible_window_tl[i] + resolution[i]:
-            new_visible_window_tl[i] = characterPosition[i] + (tile_size[i]/2) + (character_frame_size[i]/2) - resolution[i]
-    return correctWindowforBoundary(new_visible_window_tl, resolution, tile_size, mapDimensions)
+        if (characterPosition[i]+(objects.TILE_SIZE[i]/2)-(character_frame_size[i]/2)) < visible_window_tl[i]:
+            new_visible_window_tl[i] = characterPosition[i]+(objects.TILE_SIZE[i]/2)-(character_frame_size[i]/2)
+        elif (characterPosition[i]+(objects.TILE_SIZE[i]/2)+(character_frame_size[i]/2)) > visible_window_tl[i] + resolution[i]:
+            new_visible_window_tl[i] = characterPosition[i] + (objects.TILE_SIZE[i]/2) + (character_frame_size[i]/2) - resolution[i]
+    return correctWindowforBoundary(new_visible_window_tl, resolution, mapDimensions)
 
-def centerWindow(characterPosition, resolution, tile_size, mapDimensions):
-    new_visible_window_tl = [characterPosition[i]+(tile_size[i]/2)-(resolution[i]/2) for i in range(2)]
-    return correctWindowforBoundary(new_visible_window_tl, resolution, tile_size, mapDimensions)
+def centerWindow(characterPosition, resolution, mapDimensions):
+    new_visible_window_tl = [characterPosition[i]+(objects.TILE_SIZE[i]/2)-(resolution[i]/2) for i in range(2)]
+    return correctWindowforBoundary(new_visible_window_tl, resolution, mapDimensions)
 
-visible_window_tl = centerWindow(characterObj.getPosition(), resolution, tile_size, mapDimensions) 
+visible_window_tl = centerWindow(characterObj.getPosition(), resolution, mapDimensions) 
 
 menu = True
 while menu:
@@ -84,10 +83,10 @@ while menu:
 
 while True:
     windowSurfaceObj.fill(whiteColor)
-    visible_window_tl = moveWindow(characterObj.getPosition(), visible_window_tl, resolution, tile_size, character_frame_size, mapDimensions)
+    visible_window_tl = moveWindow(characterObj.getPosition(), visible_window_tl, resolution, character_frame_size, mapDimensions)
 
     for sprite_name, sprite_group in all_objects.iteritems():
-        sprite_group.update({'mapDimensions':mapDimensions,'tile_size':tile_size})
+        sprite_group.update({'mapDimensions':mapDimensions})
     
     for event in pygame.event.get():
         if event.type == QUIT:

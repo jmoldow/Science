@@ -33,12 +33,12 @@ class Map(object):
                 return object_type
         return None
 
-    def load(self, window, tile_size):
-        width, height = tile_size
+    def load(self, window):
+        width, height = objects.TILE_SIZE
         all_objects = defaultdict(pygame.sprite.Group)
         for i in range(self.getWidth()):
             for j in range(self.getHeight()):
                 terrain_type = self.get_terrain_type((i,j))
                 if terrain_type is not None:
-                    terrain_type((i*width, j*height),tile_size,all_objects[terrain_type.__name__])
+                    terrain_type((i*width, j*height),all_objects[terrain_type.__name__])
         return all_objects
