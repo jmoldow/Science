@@ -159,9 +159,7 @@ class CharacterSprite(ScienceSprite):
 
     # STILL NEED TO HANDLE COLLISIONS
     def resolveCollision(self, collidingSprites):
-        if len(collidingSprites) == 0:
-            print '.'
-        else:
+        if len(collidingSprites) != 0:
             firstCollidingSprite = collidingSprites[0]
             dx = firstCollidingSprite.getPosition()[0] - self.getPosition()[0]
             dy = firstCollidingSprite.getPosition()[1] - self.getPosition()[1]
