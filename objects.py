@@ -54,6 +54,12 @@ class ScienceSprite(pygame.sprite.Sprite):
             elif new_position[i] > (mapDimensions[i]-1)*tile_size[i]:
                 new_position[i] = (mapDimensions[i]-1)*tile_size[i]
         self.setPosition(new_position)
+    
+    def update(self, *args):
+        kwargs = args[0]
+        mapDimensions = kwargs['mapDimensions']
+        tile_size = kwargs['tile_size']
+        self.return_to_map(mapDimensions, tile_size)
 
     def render(self, window, visible_window_tl):
         if self._imagename:
@@ -84,4 +90,5 @@ class CharacterSprite(ScienceSprite):
         for KEY in dir_keys:
             if pygame.key.get_pressed()[KEY]:
                 self.setPositionDelta(4*keypad_to_pixel_dir_map[KEY][1],keypad_to_pixel_dir_map[KEY][0])
+        super(CharacterSprite,self).update(*args)
 
