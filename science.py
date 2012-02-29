@@ -70,27 +70,8 @@ def centerWindow(characterPosition):
     new_visible_window_tl = [characterPosition[i]+(objects.TILE_SIZE[i]/2)-(resolution[i]/2) for i in range(2)]
     return correctWindowforBoundary(new_visible_window_tl)
 
-if __name__ == '__main__':
-    visible_window_tl = centerWindow(characterObj.getPosition()) 
-    objects.ScienceSprite.set_visible_window_tl(visible_window_tl)
-
-    menu = True
-    while menu:
-        windowSurfaceObj.fill(whiteColor)
-        windowSurfaceObj.blit(menuImg, (0,0))
-        for event in pygame.event.get():
-            if event.type == MOUSEBUTTONDOWN:
-                x, y = event.pos
-                if 200 < y < 282:
-                    menu = False
-                elif 355 < y < 459:
-                    menu = False
-                    pygame.quit()
-                    sys.exit()
-        if menu:
-            pygame.display.update()
-            fpsClock.tick(100)
-
+def playScience():
+    global resolution, character_frame_size, windowSurfaceObj, whiteColor, all_objects, characterObj, visible_window_tl
     while True:
         if characterObj.health == 0:
             windowSurfaceObj.fill(blackColor)
@@ -101,8 +82,7 @@ if __name__ == '__main__':
             windowSurfaceObj.blit(text, textpos)
             pygame.display.update()
             pygame.time.delay(2000)
-            pygame.quit()
-            sys.exit()
+            return
 
         windowSurfaceObj.fill(whiteColor)
         visible_window_tl = moveWindow(characterObj.getPosition(), visible_window_tl)
@@ -147,3 +127,24 @@ if __name__ == '__main__':
         
         pygame.display.update()
         fpsClock.tick(100)
+
+if __name__ == '__main__':
+    visible_window_tl = centerWindow(characterObj.getPosition())
+    objects.ScienceSprite.set_visible_window_tl(visible_window_tl)
+
+    menu = True
+    while menu:
+        windowSurfaceObj.fill(whiteColor)
+        windowSurfaceObj.blit(menuImg, (0,0))
+        for event in pygame.event.get():
+            if event.type == MOUSEBUTTONDOWN:
+                x, y = event.pos
+                if 200 < y < 282:
+                    playScience()
+                elif 355 < y < 459:
+                    menu = False
+                    pygame.quit()
+                    sys.exit()
+        if menu:
+            pygame.display.update()
+            fpsClock.tick(100)
