@@ -125,7 +125,15 @@ class CharacterSprite(ScienceSprite):
     _imagename = 'media/images/DraftPlayerStill.png'
     _velocity = [0.0,0.0]
 
+    def __init__(self, position,*groups):
+        self.health = 3
+        self.beakers = 0
+        self.invuln = 0
+        super(CharacterSprite,self).__init__(position, *groups)
+
     def update(self, *args):
+        if self.invuln != 0:
+            self.invuln -= 1
         # gravity
         (outPos, outVel) = physics.applyConstantForce(self.getPosition(), self._velocity, (0.0,10.0), 0.1)
         self.setPosition(outPos)
@@ -158,6 +166,7 @@ class CharacterSprite(ScienceSprite):
         self._velocity[0] *= 0.95
         super(CharacterSprite,self).update(*args)
 
+
     # STILL NEED TO HANDLE COLLISIONS
     def resolveCollision(self, collidingSprites):
         if len(collidingSprites) != 0:
@@ -177,4 +186,23 @@ class CharacterSprite(ScienceSprite):
                     self._position[1] -= 2.0
                 else:
                     self._position[1] += 2.0
+
+
+    # STILL NEED TO HANDLE COLLISIONS
+    def resolveCollisionWithBeakers(self, collidingBeakers):
+        for sprite in collidingBeakers:
+            self.getBeaker(collidingBeakers)
+
+    def resolveCollisionWithEvil(self, collidingEvil):
+        for sprite in collidingEvil:
+            if self.invuln == 0:
+                self.damage()
+
+    def getBeaker(self, collidingBeakers):
+        for sprite in collidingBeakers:
+            self.beakers += 1
+
+    def damage(self):
+        self.health -= 1
+        self.invuln = 50
 

@@ -26,6 +26,7 @@ windowSurfaceObj = pygame.display.set_mode(resolution)
 pygame.display.set_caption('Science!')
 
 whiteColor = pygame.Color(255,255,255)
+blackColor = pygame.Color(0,0,0)
 menuImg = pygame.image.load('media/images/menu.png')
 keypad_to_pixel_dir_map = {K_UP:(1,-1), K_DOWN:(1,1), K_RIGHT:(0,1), K_LEFT:(0,-1)}
 dir_keys = keypad_to_pixel_dir_map.keys()
@@ -91,6 +92,18 @@ if __name__ == '__main__':
             fpsClock.tick(100)
 
     while True:
+        if characterObj.health == 0:
+            windowSurfaceObj.fill(blackColor)
+            font = pygame.font.Font(None, 50)
+            text=font.render("You are dead.", True, whiteColor)
+            textpos = text.get_rect(centerx=resolution[0]/2)
+            textpos.top = 300
+            windowSurfaceObj.blit(text, textpos)
+            pygame.display.update()
+            pygame.time.delay(2000)
+            pygame.quit()
+            sys.exit()
+
         windowSurfaceObj.fill(whiteColor)
         visible_window_tl = moveWindow(characterObj.getPosition(), visible_window_tl)
         if maps.imagename:
@@ -104,8 +117,21 @@ if __name__ == '__main__':
         spriteGroupsToCollideWith = [all_objects['PlatformSprite'], all_objects['BackgroundPlatformSprite']]
         for spriteGroup in spriteGroupsToCollideWith:
             collidingSprites.extend(pygame.sprite.spritecollide(characterObj, spriteGroup, False))
-            characterObj.resolveCollision(collidingSprites)
-        
+        characterObj.resolveCollision(collidingSprites)
+
+        collidingBeakers = pygame.sprite.spritecollide(characterObj, all_objects["BeakerSprite"], True)
+        if len(collidingBeakers) != 0:
+            characterObj.resolveCollisionWithBeakers(collidingBeakers)
+
+
+        collidingEvil = []
+        spriteGroupsToCollideWith = [all_objects['FireSprite'], all_objects['SharkSprite']]
+        for spriteGroup in spriteGroupsToCollideWith:
+            collidingEvil.extend(pygame.sprite.spritecollide(characterObj, spriteGroup, False))
+        if len(collidingEvil) != 0:
+            characterObj.resolveCollisionWithEvil(collidingEvil)
+
+
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
