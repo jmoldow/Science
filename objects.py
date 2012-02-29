@@ -102,6 +102,7 @@ class PlatformSprite(ScienceSprite):
 
 class BackgroundPlatformSprite(PlatformSprite):
     _map_char = 'p'
+    _imagename = ''
 
 class FireSprite(ScienceSprite):
     _map_char = 'f'
