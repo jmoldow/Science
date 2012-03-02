@@ -179,6 +179,7 @@ class CharacterSprite(ScienceSprite):
         self.health = 3
         self.beakers = 0
         self.invuln = 0
+        self.damageFlash = 0
         self._velocity = [0.0,0.0]
         super(CharacterSprite,self).__init__(*args, **kwargs)
         self._imgkey = 1
@@ -186,6 +187,8 @@ class CharacterSprite(ScienceSprite):
     def update(self, *args):
         if self.invuln != 0:
             self.invuln -= 1
+        if self.damageFlash != 0:
+            self.damageFlash -= 1
         # gravity
         (outPos, outVel) = physics.applyConstantForce(self.getPosition(), self._velocity, (0.0,10.0), 0.1)
         self.setPosition(outPos)
@@ -264,4 +267,5 @@ class CharacterSprite(ScienceSprite):
     def damage(self):
         self.health -= 1
         self.invuln = 50
+        self.damageFlash = 5
             

@@ -153,9 +153,13 @@ def playScience():
                     explosionSprite = objects.ExplosionSprite(mypos, all_objects['ExplosionSprite'], size=(96,96))
         # Check for shark removal
                     collidingSharkExplosions = pygame.sprite.spritecollide(explosionSprite, all_objects['SharkSprite'], True)
-                    
-                    
-        
+
+        if characterObj.damageFlash != 0:
+            windowSurfaceObj.fill(whiteColor)
+            pygame.display.update()
+            fpsClock.tick(100)
+            continue
+
         for sprite_name, sprite_group in all_objects.iteritems():
             if getattr(objects,sprite_name)._imagename:
                 sprite_group.draw(windowSurfaceObj)
