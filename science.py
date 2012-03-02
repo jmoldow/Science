@@ -103,10 +103,15 @@ def playScience():
             sprite_group.update()
         
         collidingSprites = []
+        # collidingSharks = {}
         spriteGroupsToCollideWith = [all_objects['PlatformSprite'], all_objects['BackgroundPlatformSprite']]
         for spriteGroup in spriteGroupsToCollideWith:
             collidingSprites.extend(pygame.sprite.spritecollide(characterObj, spriteGroup, False))
+            # collidingSharks.update(pygame.sprite.groupcollide(all_objects['SharkSprite'], spriteGroup, False, False))
         characterObj.resolveCollision(collidingSprites)
+        # for shark in collidingSharks.keys():
+            # shark._velocity *= -1
+            # shark._imgkey = 1-shark._imgkey
 
         collidingBeakers = pygame.sprite.spritecollide(characterObj, all_objects["BeakerSprite"], True)
         if len(collidingBeakers) != 0:

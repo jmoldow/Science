@@ -142,8 +142,15 @@ class SharkSprite(ScienceSprite):
                 size = [2*size[i] for i in range(2)]
                 super(SharkSprite,self).__init__(position=position,groups=groups,size=size)
                 self._imgkey = (1-delta)/2
+                self._velocity = -delta
         if error:
             raise Exception("The shark sprite at (%s,%s) is incorrectly positioned in the map file." % (position[0],position[1]))
+
+    def update(self, *args):
+        if self._position[0] < 0 or self._position[0] >= maps.dimensions[0]*TILE_SIZE[0]:
+            self._velocity *= -1
+            self._imgkey = 1-self._imgkey
+        self.setPositionDelta(self._velocity, 0)
 
 class CharacterSprite(ScienceSprite):
     _map_char = 'C'
