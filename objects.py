@@ -149,12 +149,12 @@ class SharkSprite(ScienceSprite):
 class CharacterSprite(ScienceSprite):
     _map_char = 'C'
     _imagename = ['media/images/character_left.png', 'media/images/character_still.png', 'media/images/character_right.png']
-    _velocity = [0.0,0.0]
 
     def __init__(self, *args, **kwargs):
         self.health = 3
         self.beakers = 0
         self.invuln = 0
+        self._velocity = [0.0,0.0]
         super(CharacterSprite,self).__init__(*args, **kwargs)
         self._imgkey = 1
 

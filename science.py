@@ -38,16 +38,6 @@ for object_name in objects.__all__:
     else:
         object_type._set_imgsurf()
 
-maps.parse_map_file(filename=mapname)
-all_objects = maps.load(windowSurfaceObj)
-characterObj = None
-if len(all_objects['CharacterSprite']) == 1:
-    characterObj = all_objects['CharacterSprite'].sprites()[0]
-elif len(all_objects['CharacterSprite']):
-    raise Exception('The map you loaded has more than two character starting positions.')
-else:
-    raise Exception('The map you loaded has no character starting position.')
-
 def correctWindowforBoundary(visible_window_tl):
     new_visible_window_tl = list(visible_window_tl)
     for i in range(2):
@@ -71,7 +61,19 @@ def centerWindow(characterPosition):
     return correctWindowforBoundary(new_visible_window_tl)
 
 def playScience():
-    global resolution, character_frame_size, windowSurfaceObj, whiteColor, all_objects, characterObj, visible_window_tl
+    global resolution, character_frame_size, windowSurfaceObj, whiteColor
+    all_objects = maps.load(windowSurfaceObj)
+    characterObj = None
+    if len(all_objects['CharacterSprite']) == 1:
+        characterObj = all_objects['CharacterSprite'].sprites()[0]
+    elif len(all_objects['CharacterSprite']):
+        raise Exception('The map you loaded has more than two character starting positions.')
+    else:
+        raise Exception('The map you loaded has no character starting position.')
+
+    visible_window_tl = centerWindow(characterObj.getPosition())
+    objects.ScienceSprite.set_visible_window_tl(visible_window_tl)
+
     while True:
         if characterObj.health == 0:
             windowSurfaceObj.fill(blackColor)
@@ -129,9 +131,7 @@ def playScience():
         fpsClock.tick(100)
 
 if __name__ == '__main__':
-    visible_window_tl = centerWindow(characterObj.getPosition())
-    objects.ScienceSprite.set_visible_window_tl(visible_window_tl)
-
+    maps.parse_map_file(filename=mapname)
     menu = True
     while menu:
         windowSurfaceObj.fill(whiteColor)
