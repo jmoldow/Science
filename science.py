@@ -80,6 +80,8 @@ def playScience():
         raise Exception('The map you loaded has more than two character starting positions.')
     else:
         raise Exception('The map you loaded has no character starting position.')
+    if len(all_objects['WinSprite']) == 0:
+        raise Exception('The map you loaded has no level exit.')
 
     visible_window_tl = centerWindow(characterObj.getPosition())
     objects.ScienceSprite.set_visible_window_tl(visible_window_tl)
