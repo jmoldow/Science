@@ -3,7 +3,7 @@ import physics
 from pygame.locals import *
 import maps
 
-__all__ = ['ScienceSprite', 'StalactiteSprite', 'PlatformSprite', 'BackgroundPlatformSprite', 'FireSprite', 'BeakerSprite', 'StalagmiteSprite', 'SharkSprite', 'CharacterSprite']
+__all__ = ['ScienceSprite', 'StalactiteSprite', 'PlatformSprite', 'BackgroundPlatformSprite', 'ExplosionSprite', 'FireSprite', 'BeakerSprite', 'StalagmiteSprite', 'SharkSprite', 'CharacterSprite']
 
 # TODO - we shouldn't have to reproduce this in both files
 TILE_SIZE = (32, 32)
@@ -123,9 +123,25 @@ class BeakerSprite(ScienceSprite):
     _map_char = '*'
     _imagename = 'media/images/beaker.png'
 
+class ExplosionSprite(ScienceSprite):
+    _map_char = None
+    _imagename = 'media/images/explosion.png'
+    _timetolive = 0
+    def __init__(self, position, groups, size=(96,96)):
+        self.timetolive = 20
+        super(ExplosionSprite,self).__init__(position=position, groups=groups, size=size)
+    def update(self, *args):
+        if self.timetolive > 0:
+            self.timetolive -= 1
+        else:
+            self.remove(self.groups()[0])
+            
+
+            
 class StalagmiteSprite(ScienceSprite):
     _map_char = '^'
     _imagename = 'media/images/stalagmite.png'
+
 
 class SharkSprite(ScienceSprite):
     _map_char = 's'
@@ -245,4 +261,4 @@ class CharacterSprite(ScienceSprite):
     def damage(self):
         self.health -= 1
         self.invuln = 50
-
+            
