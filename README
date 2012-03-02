@@ -23,6 +23,9 @@ $ python science.py
 or, in Windows:
 $ dist/science.exe
 
+Instructions:
+Click ``Instructions'' on the menu in the game
+
 Dependencies:
  * Python 2.7 <http://python.org/download/releases/2.7.2/>
  * Pygame 1.9 <http://pygame.org/download.shtml>

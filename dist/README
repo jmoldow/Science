@@ -21,9 +21,8 @@ Git repository: <github.com/jmoldow/Science.git>
 To run:
 Run the Windows executable science.exe
 
-Dependencies:
- * Python 2.7 <http://python.org/download/releases/2.7.2/>
- * Pygame 1.9 <http://pygame.org/download.shtml>
+Instructions:
+Click ``Instructions'' on the menu in the game
 
 High Level Design Doc: media/high_level_design_doc.pdf
 
@@ -37,16 +36,6 @@ Known Defects:
  improvements might be made by using the DirtySprite class, not
  rendering objects that appear off-screen, and being smarter about
  collision detection.
-
-Loading Your Own Maps:
-In commit eb0e0a2de3 and earlier, you could load different maps with
-$ python science.py --file=<filename>
-where <filename> is a text file containing a valid map definition (see
-maps/README for more information on valid map definitions). The map
-used by the current version of the game is loaded from
-maps/building.txt. The ability to load any valid map was removed in
-commit 501ac342f3 so that we could compile the code to a single Windows
-executable.
 
 License and Copywrite Information:
 This game is free and open source. Anyone may view, download, and
