@@ -94,6 +94,18 @@ def playScience():
             pygame.time.delay(2000)
             return
 
+        winCondition = pygame.sprite.spritecollide(characterObj, all_objects["WinSprite"], False)
+        if len(winCondition) != 0:
+            windowSurfaceObj.fill(blackColor)
+            font = pygame.font.Font(None, 50)
+            text=font.render("You win! Woo and yay!", True, whiteColor)
+            textpos = text.get_rect(centerx=resolution[0]/2)
+            textpos.top = 300
+            windowSurfaceObj.blit(text, textpos)
+            pygame.display.update()
+            pygame.time.delay(2000)
+            return
+
         windowSurfaceObj.fill(whiteColor)
         visible_window_tl = moveWindow(characterObj.getPosition(), visible_window_tl)
         if maps.imagename:

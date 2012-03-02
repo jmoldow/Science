@@ -3,7 +3,7 @@ import physics
 from pygame.locals import *
 import maps
 
-__all__ = ['ScienceSprite', 'StalactiteSprite', 'PlatformSprite', 'BackgroundPlatformSprite', 'ExplosionSprite', 'FireSprite', 'BeakerSprite', 'StalagmiteSprite', 'SharkSprite', 'CharacterSprite']
+__all__ = ['ScienceSprite', 'StalactiteSprite', 'PlatformSprite', 'BackgroundPlatformSprite', 'ExplosionSprite', 'FireSprite', 'BeakerSprite', 'StalagmiteSprite', 'WinSprite', 'SharkSprite', 'CharacterSprite']
 
 # TODO - we shouldn't have to reproduce this in both files
 TILE_SIZE = (32, 32)
@@ -142,6 +142,9 @@ class StalagmiteSprite(ScienceSprite):
     _map_char = '^'
     _imagename = 'media/images/stalagmite.png'
 
+class WinSprite(ScienceSprite):
+    _map_char = 'W'
+    _imagename = 'media/images/heart.png'
 
 class SharkSprite(ScienceSprite):
     _map_char = 's'
