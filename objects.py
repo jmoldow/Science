@@ -21,7 +21,7 @@ class ScienceSprite(pygame.sprite.Sprite):
         self._position = list(position)
         if size == TILE_SIZE:
             self._position = [self._position[i]*TILE_SIZE[i] for i in range(2)]
-        self.rectangle = pygame.Rect(self._position,size)
+        self._size = size
         if not isinstance(groups,(list,tuple)):
             groups = [groups]
         if isinstance(self._imagename,(list,tuple)):
@@ -69,13 +69,12 @@ class ScienceSprite(pygame.sprite.Sprite):
         return self.getPosition()
 
     def getRelativeWindowPosition(self):
-        return [self.rectangle.topleft[i] - self._visible_window_tl[i] for i in range(2)]
+        return [self._position[i] - self._visible_window_tl[i] for i in range(2)]
 
     def getRelativeRect(self):
-        return pygame.Rect(self.getRelativeWindowPosition(),self.rectangle.size)
+        return pygame.Rect(self.getRelativeWindowPosition(),self._size)
     
     def setPosition(self, position):
-        self.rectangle.topleft = list(position)
         self._position = list(position)
 
     def setRelativeWindowPosition(self, position):
@@ -83,13 +82,13 @@ class ScienceSprite(pygame.sprite.Sprite):
 
     def setRelativeRect(self, *args, **kwargs):
         new_rect = pygame.Rect(*args, **kwargs)
-        self.rectangle.size = new_rect.size
+        self._size = new_rect.size
         self.setRelativeWindowPosition(new_rect.topleft)
     rect = property(getRelativeRect, setRelativeRect)
 
     def setPositionDelta(self, delta, i=-1):
         if i==-1:
-            self.rectangle.topleft = [self.rectangle.topleft[i] + delta[i] for i in range(2)]
+            self.setPosition([self._position[i] + delta[i] for i in range(2)])
         else:
             new_topleft = list(self.getPosition())
             new_topleft[i] += delta
@@ -100,7 +99,7 @@ class ScienceSprite(pygame.sprite.Sprite):
             pos = self.getRelativeWindowPosition()
             window_dims = window.get_size()
             for i in range(2):
-                if pos[i] + self.rectangle.size[i] < 0 or pos[i] >= window_dims[0]:
+                if pos[i] + self._size[i] < 0 or pos[i] >= window_dims[0]:
                     return
             window.blit(self._imgsurf, pos)
 
@@ -179,15 +178,15 @@ class CharacterSprite(ScienceSprite):
         self._velocity = outVel
          
         # constrain position and velocity
-        new_topleft = list(self.rectangle.topleft)
+        new_topleft = list(self._position)
         for i in range(2):
             if new_topleft[i] < 0:
                 new_topleft[i] = 0
                 self._velocity[i] = 2
-            elif new_topleft[i] > (maps.dimensions[i]-1)*self.rectangle.size[i]:
-                new_topleft[i] = (maps.dimensions[i]-1)*self.rectangle.size[i]
+            elif new_topleft[i] > (maps.dimensions[i]-1)*self._size[i]:
+                new_topleft[i] = (maps.dimensions[i]-1)*self._size[i]
                 self._velocity[i] = -2
-        self.rectangle.topleft = new_topleft
+        self._position = new_topleft
 
         # friction in horizontal direction of 5%
         self._velocity[0] *= 0.95
