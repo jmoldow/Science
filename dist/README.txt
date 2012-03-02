@@ -19,9 +19,7 @@ Project home page: <github.com/jmoldow/Science>
 Git repository: <github.com/jmoldow/Science.git>
 
 To run:
-$ python science.py
-or, in Windows:
-$ dist/science.exe
+Run the Windows executable science.exe
 
 Dependencies:
  * Python 2.7 <http://python.org/download/releases/2.7.2/>
