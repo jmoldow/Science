@@ -12,6 +12,7 @@ keypad_direction_map = {K_UP:(0,-1), K_RIGHT:(1,0), K_LEFT:(-1,0)}
 class ScienceSprite(pygame.sprite.Sprite):
     
     _imagename = ''
+    _imgsurf = None
     _map_char = ''
     _position = [0.0,0.0]
     
@@ -23,20 +24,27 @@ class ScienceSprite(pygame.sprite.Sprite):
         self.rectangle = pygame.Rect(self._position,size)
         if not isinstance(groups,(list,tuple)):
             groups = [groups]
+        if isinstance(self._imagename,(list,tuple)):
+            self._imgkey = 0
+        elif isinstance(self._imagename,dict):
+            self._imgkey = self._imagename.keys()[0]
         super(ScienceSprite,self).__init__(*groups)
     
     @classmethod
     def _set_imgsurf(cls):
-        if cls._imagename and not hasattr(cls,'_imgsurf'):
-            setattr(cls,'_imgsurf',pygame.image.load(cls._imagename))
+        if cls._imagename and not cls._imgsurf:
+            if isinstance(cls._imagename,basestring):
+                cls._imagename = [cls._imagename]
+            if isinstance(cls._imagename,(list,tuple)):
+                cls._imgsurf = [pygame.image.load(name) for name in cls._imagename]
+            elif isinstance(cls._imagename,dict):
+                cls._imgsurf = dict([(key, pygame.image.load(cls._imagename[key])) for key in cls_imagename.keys()])
     
-    @classmethod
-    def getImageName(cls):
-        return cls._imagename
+    def getImageName(self):
+        return self._imagename[self._imgkey]
     
-    @classmethod
-    def getImage(cls):
-        return cls._imgsurf
+    def getImage(self):
+        return self._imgsurf[self._imgkey]
 
     @property
     def image(self):
@@ -122,7 +130,7 @@ class StalagmiteSprite(ScienceSprite):
 
 class SharkSprite(ScienceSprite):
     _map_char = 's'
-    _imagename = 'media/images/shark_right.png'
+    _imagename = ['media/images/shark_left.png','media/images/shark_right.png']
 
     def __init__(self, position, groups, size=TILE_SIZE):
         error = True
@@ -134,12 +142,13 @@ class SharkSprite(ScienceSprite):
                 position = [(position[0]+(delta-1)/2)*TILE_SIZE[0], (position[1]-1)*TILE_SIZE[1]]
                 size = [2*size[i] for i in range(2)]
                 super(SharkSprite,self).__init__(position=position,groups=groups,size=size)
+                self._imgkey = (1-delta)/2
         if error:
             raise Exception("The shark sprite at (%s,%s) is incorrectly positioned in the map file." % (position[0],position[1]))
 
 class CharacterSprite(ScienceSprite):
     _map_char = 'C'
-    _imagename = 'media/images/DraftPlayerStill.png'
+    _imagename = ['media/images/character_left.png', 'media/images/DraftPlayerStill.png', 'media/images/character_right.png']
     _velocity = [0.0,0.0]
 
     def __init__(self, *args, **kwargs):
@@ -147,6 +156,7 @@ class CharacterSprite(ScienceSprite):
         self.beakers = 0
         self.invuln = 0
         super(CharacterSprite,self).__init__(*args, **kwargs)
+        self._imgkey = 1
 
     def update(self, *args):
         if self.invuln != 0:
@@ -181,6 +191,13 @@ class CharacterSprite(ScienceSprite):
 
         # friction in horizontal direction of 5%
         self._velocity[0] *= 0.95
+
+        if -1 < self._velocity[0] < 1:
+            self._imgkey = 1
+        elif self._velocity[0] >= 1:
+            self._imgkey = 2
+        elif self._velocity[0] <= -1:
+            self._imgkey = 0
         super(CharacterSprite,self).update(*args)
 
 
