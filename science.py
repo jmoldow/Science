@@ -86,7 +86,7 @@ def playScience():
     while True:
         if characterObj.health == 0:
             windowSurfaceObj.fill(blackColor)
-            font = pygame.font.Font(None, 50)
+            font = pygame.font.Font("freesansbold.ttf", 16)
             text=font.render("You are dead.", True, whiteColor)
             textpos = text.get_rect(centerx=windowSize[0]/2)
             textpos.top = 300
@@ -98,8 +98,8 @@ def playScience():
         winCondition = pygame.sprite.spritecollide(characterObj, all_objects["WinSprite"], False)
         if len(winCondition) != 0:
             windowSurfaceObj.fill(blackColor)
-            font = pygame.font.Font(None, 50)
-            text=font.render("You win! Woo and yay!", True, whiteColor)
+            font = pygame.font.Font("freesansbold.ttf", 16)
+            text=font.render("You escaped the lab!", True, whiteColor)
             textpos = text.get_rect(centerx=resolution[0]/2)
             textpos.top = 300
             windowSurfaceObj.blit(text, textpos)
@@ -168,7 +168,7 @@ def playScience():
         windowSurfaceObj.blit(heartImg, (40,resolution[1]+inventoryBarImageHeight))
         windowSurfaceObj.blit(beakerImg, (170,resolution[1]+inventoryBarImageHeight))
 
-        font = pygame.font.Font(None, 36)
+        font = pygame.font.Font("freesansbold.ttf", 16)
         textHealth =font.render("x " + str(characterObj.health), True, whiteColor)
         textBeakers =font.render("x " + str(characterObj.beakers), True, whiteColor)
         windowSurfaceObj.blit(textHealth, (80,resolution[1]+inventoryBarTextHeight))
