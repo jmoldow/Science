@@ -33,6 +33,12 @@ Known Defects:
  * Collision detection between the playable character and the platforms
  doesn't always work correctly. It is possible to phase through one or
  more blocks, and even to become stuck inside them.
+ * Game can run slowly at times, depending on the machine and on how
+ much memory is currently being used. This is because we took the naive
+ approach to rendering sprites and detecting collisions. Future
+ improvements might be made by using the DirtySprite class, not
+ rendering objects that appear off-screen, and being smarter about
+ collision detection.
 
 Loading Your Own Maps:
 In commit eb0e0a2de3 and earlier, you could load different maps with
