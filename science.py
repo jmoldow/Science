@@ -33,6 +33,7 @@ pygame.display.set_caption('Science!')
 whiteColor = pygame.Color(255,255,255)
 blackColor = pygame.Color(0,0,0)
 menuImg = pygame.image.load('media/images/menu.png')
+instructionsImg = pygame.image.load('media/images/instructions.png')
 keypad_to_pixel_dir_map = {K_UP:(1,-1), K_DOWN:(1,1), K_RIGHT:(0,1), K_LEFT:(0,-1)}
 dir_keys = keypad_to_pixel_dir_map.keys()
 
@@ -177,21 +178,32 @@ def playScience():
         pygame.display.update()
         fpsClock.tick(100)
 
+def instructions():
+    while True:
+        windowSurfaceObj.fill(whiteColor)
+        windowSurfaceObj.blit(instructionsImg, (0,0))
+        for event in pygame.event.get():
+            if event.type == MOUSEBUTTONDOWN:
+                x, y = event.pos
+                if 10 < x < 85 and 20 < y < 125:
+                    return
+        pygame.display.update()
+        fpsClock.tick(100)
+
 if __name__ == '__main__':
     maps.parse_map_file(filename=mapname)
-    menu = True
-    while menu:
+    while True:
         windowSurfaceObj.fill(whiteColor)
         windowSurfaceObj.blit(menuImg, (0,0))
         for event in pygame.event.get():
             if event.type == MOUSEBUTTONDOWN:
                 x, y = event.pos
-                if 200 < y < 282:
+                if 200 < y < 282 and x < 515:
                     playScience()
-                elif 355 < y < 459:
-                    menu = False
+                elif 325 < y < 450 and x < 275:
                     pygame.quit()
                     sys.exit()
-        if menu:
-            pygame.display.update()
-            fpsClock.tick(100)
+                elif 310 < y < 365 and x > 345:
+                    instructions()
+        pygame.display.update()
+        fpsClock.tick(100)
