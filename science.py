@@ -13,8 +13,9 @@ if not pygame.mixer: print 'Warning, sound disabled'
 # parser.add_option("-f", "--filename", type="string")
 
 
-assert "--file=" in sys.argv[1], "Call this program as python science.py --filename=<filename>"
-mapname = sys.argv[1].partition("=")[2]
+#assert "--file=" in sys.argv[1], "Call this program as python science.py --filename=<filename>"
+#mapname = sys.argv[1].partition("=")[2]
+mapname = 'maps/building.txt'
 
 pygame.init()
 fpsClock = pygame.time.Clock()
