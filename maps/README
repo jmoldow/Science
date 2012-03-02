@@ -1,0 +1,33 @@
+In commit eb0e0a2de3 and earlier, you could run the game with any map
+you wanted. The map was loaded from a text file input, using the
+conversions described below. The map loaded by default in the current
+version of the game is defined in ./building.txt.
+
+The map file must be an ASCII text file with the same number of ASCII
+characters on each line, with a Linux-style newline terminating each
+line. A path to a background image (which will pan with the
+map itself during gameplay) can be provided as an optional, special
+first line of the text file. The path can either be absolute, or
+relative to the directory that science.py is located in.
+
+Each of the following ASCII characters gets mapped to a 32 x 32 pixel
+object during gameplay.
+
+p - platform (rendered transparent (used if the platforms are drawn
+into background image))
+- - platform (rendered with an image)
+f - fire!
+* - beaker of science!
+^ - stalagmite
+V - stalactite
+C - initial character position (required)
+W - level exit (required)
+
+
+Sharks are represented by a 2x2 group of ASCII characters:
+Shark Facing Right              Shark Facing Left
+oo                              oo
+os                              so
+
+Any other characters are treated as open spaces, and aren't rendered
+into interactable objects.

@@ -1,4 +1,51 @@
-Run this game with 
-python science.py --file=<filename>
-where <filename> is the relative path to the map you want to load. 
-Default maps are available in the maps/ directory.
+////////////////////////////////////////////////////////////////
+
+        SCIENCE! - the game
+
+////////////////////////////////////////////////////////////////
+
+Authors:
+ * Matt Redmond <mrdmnd@mit.edu>
+ * Jordan Moldow <jmoldow@mit.edu>
+ * Melissa Ko <mesako@mit.edu>
+ * Zandra Vinegar <ch3cooh@mit.edu>
+
+Attributions:
+ * Art adapted from the webcomic, ``xkcd'' by Randall Munroe, available
+ under a Creative Commons Attribution-Noncommercial 2.5 license.
+ See <xkcd.com>.
+
+Project home page: <github.com/jmoldow/Science>
+Git repository: <github.com/jmoldow/Science.git>
+
+To run:
+$ python science.py
+or, in Windows:
+$ dist/science.exe
+
+Dependencies:
+ * Python 2.7 <http://python.org/download/releases/2.7.2/>
+ * Pygame 1.9 <http://pygame.org/download.shtml>
+
+High Level Design Doc: media/high_level_design_doc.pdf
+
+Known Defects:
+ * Collision detection between the playable character and the platforms
+ doesn't always work correctly. It is possible to phase through one or
+ more blocks, and even to become stuck inside them.
+
+Loading Your Own Maps:
+In commit eb0e0a2de3 and earlier, you could load different maps with
+$ python science.py --file=<filename>
+where <filename> is a text file containing a valid map definition (see
+maps/README for more information on valid map definitions). The map
+used by the current version of the game is loaded from
+maps/building.txt. The ability to load any valid map was removed in
+commit 501ac342f3 so that we could compile the code to a single Windows
+executable.
+
+License and Copywrite Information:
+This game is free and open source. Anyone may view, download, and
+modify the code. We would appreciate it if you contacted us before
+doing so, but this is not required. Please attribute us, as well as
+xkcd / Randall Munroe.
