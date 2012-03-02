@@ -15,10 +15,14 @@ class ScienceSprite(pygame.sprite.Sprite):
     _map_char = ''
     _position = [0.0,0.0]
     
-    def __init__(self,position,*groups):
+    def __init__(self, position, groups, size=TILE_SIZE):
         # it's possible we need a separate position variable that is a float
         self._position = list(position)
-        self.rectangle = pygame.Rect(position,TILE_SIZE)
+        if size == TILE_SIZE:
+            self._position = [self._position[i]*TILE_SIZE[i] for i in range(2)]
+        self.rectangle = pygame.Rect(self._position,size)
+        if not isinstance(groups,(list,tuple)):
+            groups = [groups]
         super(ScienceSprite,self).__init__(*groups)
     
     @classmethod
@@ -118,18 +122,31 @@ class StalagmiteSprite(ScienceSprite):
 
 class SharkSprite(ScienceSprite):
     _map_char = 's'
-    _imagename = 'media/images/shark_right_unit.png'
+    _imagename = 'media/images/shark_right.png'
+
+    def __init__(self, position, groups, size=TILE_SIZE):
+        error = True
+        for delta in (-1,1):
+            if 0 <= position[0]+delta < maps.dimensions[0] and maps.data[position[1]][position[0]+delta] == 'o':
+                if not (0 <= position[1]-1 < maps.dimensions[1] and maps.data[position[1]-1][position[0]] == 'o' and maps.data[position[1]-1][position[0]+delta] == 'o'):
+                    continue
+                error = False
+                position = [(position[0]+(delta-1)/2)*TILE_SIZE[0], (position[1]-1)*TILE_SIZE[1]]
+                size = [2*size[i] for i in range(2)]
+                super(SharkSprite,self).__init__(position=position,groups=groups,size=size)
+        if error:
+            raise Exception("The shark sprite at (%s,%s) is incorrectly positioned in the map file." % (position[0],position[1]))
 
 class CharacterSprite(ScienceSprite):
     _map_char = 'C'
     _imagename = 'media/images/DraftPlayerStill.png'
     _velocity = [0.0,0.0]
 
-    def __init__(self, position,*groups):
+    def __init__(self, *args, **kwargs):
         self.health = 3
         self.beakers = 0
         self.invuln = 0
-        super(CharacterSprite,self).__init__(position, *groups)
+        super(CharacterSprite,self).__init__(*args, **kwargs)
 
     def update(self, *args):
         if self.invuln != 0:

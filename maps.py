@@ -35,11 +35,10 @@ def get_terrain_type(position):
     return None
 
 def load(window):
-    width, height = objects.TILE_SIZE
     all_objects = defaultdict(pygame.sprite.Group)
     for i in range(dimensions[0]):
         for j in range(dimensions[1]):
             terrain_type = get_terrain_type((i,j))
             if terrain_type is not None:
-                terrain_type((i*width, j*height),all_objects[terrain_type.__name__])
+                terrain_type(position=(i,j),groups=[all_objects[terrain_type.__name__]])
     return all_objects
