@@ -20,9 +20,13 @@ pygame.init()
 fpsClock = pygame.time.Clock()
 
 resolution = (640,480)
+inventoryBarHeight = 65
+windowSize = (resolution[0],resolution[1]+inventoryBarHeight)
+inventoryBarImageHeight = 15
+inventoryBarTextHeight = 20
 character_frame_size = (320,240)
 
-windowSurfaceObj = pygame.display.set_mode(resolution)
+windowSurfaceObj = pygame.display.set_mode(windowSize)
 pygame.display.set_caption('Science!')
 
 whiteColor = pygame.Color(255,255,255)
@@ -30,6 +34,9 @@ blackColor = pygame.Color(0,0,0)
 menuImg = pygame.image.load('media/images/menu.png')
 keypad_to_pixel_dir_map = {K_UP:(1,-1), K_DOWN:(1,1), K_RIGHT:(0,1), K_LEFT:(0,-1)}
 dir_keys = keypad_to_pixel_dir_map.keys()
+
+heartImg = pygame.image.load('media/images/heart.png')
+beakerImg = pygame.image.load('media/images/beaker.png')
 
 for object_name in objects.__all__:
     object_type = getattr(objects,object_name,None)
@@ -61,7 +68,7 @@ def centerWindow(characterPosition):
     return correctWindowforBoundary(new_visible_window_tl)
 
 def playScience():
-    global resolution, character_frame_size, windowSurfaceObj, whiteColor
+    global resolution, windowSize, inventoryBarHeight, inventoryBarImageHeight, inventoryBarTextHeight, character_frame_size, windowSurfaceObj, whiteColor
     all_objects = maps.load(windowSurfaceObj)
     characterObj = None
     if len(all_objects['CharacterSprite']) == 1:
@@ -79,7 +86,7 @@ def playScience():
             windowSurfaceObj.fill(blackColor)
             font = pygame.font.Font(None, 50)
             text=font.render("You are dead.", True, whiteColor)
-            textpos = text.get_rect(centerx=resolution[0]/2)
+            textpos = text.get_rect(centerx=windowSize[0]/2)
             textpos.top = 300
             windowSurfaceObj.blit(text, textpos)
             pygame.display.update()
@@ -127,6 +134,17 @@ def playScience():
         # if this becomes an issue, we can try something else
 
         
+        inventory = pygame.Rect(0, resolution[1], resolution[0], inventoryBarHeight)
+        windowSurfaceObj.fill(blackColor, inventory)
+        windowSurfaceObj.blit(heartImg, (40,resolution[1]+inventoryBarImageHeight))
+        windowSurfaceObj.blit(beakerImg, (170,resolution[1]+inventoryBarImageHeight))
+
+        font = pygame.font.Font(None, 36)
+        textHealth =font.render("x " + str(characterObj.health), True, whiteColor)
+        textBeakers =font.render("x " + str(characterObj.beakers), True, whiteColor)
+        windowSurfaceObj.blit(textHealth, (80,resolution[1]+inventoryBarTextHeight))
+        windowSurfaceObj.blit(textBeakers, (210,resolution[1]+inventoryBarTextHeight))
+
         pygame.display.update()
         fpsClock.tick(100)
 
