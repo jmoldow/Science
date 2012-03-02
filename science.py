@@ -70,6 +70,7 @@ def centerWindow(characterPosition):
 def playScience():
     global resolution, windowSize, inventoryBarHeight, inventoryBarImageHeight, inventoryBarTextHeight, character_frame_size, windowSurfaceObj, whiteColor
     all_objects = maps.load(windowSurfaceObj)
+    all_objects['ExplosionSprite'] = pygame.sprite.Group()
     characterObj = None
     if len(all_objects['CharacterSprite']) == 1:
         characterObj = all_objects['CharacterSprite'].sprites()[0]
@@ -130,6 +131,16 @@ def playScience():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
+            if event.type == KEYDOWN:
+                if event.key == K_SPACE and characterObj.beakers > 0:
+                    characterObj.beakers -= 1
+                    cpos = characterObj.getPosition()
+                    mypos = (cpos[0]-32, cpos[1]-32)
+                    explosionSprite = objects.ExplosionSprite(mypos, all_objects['ExplosionSprite'], size=(96,96))
+        # Check for shark removal
+                    collidingSharkExplosions = pygame.sprite.spritecollide(explosionSprite, all_objects['SharkSprite'], True)
+                    
+                    
         
         for sprite_name, sprite_group in all_objects.iteritems():
             if getattr(objects,sprite_name)._imagename:
