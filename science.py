@@ -136,7 +136,7 @@ def playScience():
 
 
         collidingEvil = []
-        spriteGroupsToCollideWith = [all_objects['FireSprite'], all_objects['SharkSprite']]
+        spriteGroupsToCollideWith = [all_objects['FireSprite'], all_objects['SharkSprite'], all_objects['StalactiteSprite'], all_objects['StalagmiteSprite']]
         for spriteGroup in spriteGroupsToCollideWith:
             collidingEvil.extend(pygame.sprite.spritecollide(characterObj, spriteGroup, False))
         if len(collidingEvil) != 0:
